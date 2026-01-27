@@ -19,25 +19,30 @@ repositories {
 }
 
 dependencies {
-    // Web
+
+    /* -------------------- WEB -------------------- */
     implementation 'org.springframework.boot:spring-boot-starter-web'
 
-    // JPA + Database
+    /* -------------------- JPA -------------------- */
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 
-    // Security (for auth)
+    /* -------------------- SECURITY -------------------- */
     implementation 'org.springframework.boot:spring-boot-starter-security'
 
-    // Database driver (choose ONE)
+    /* -------------------- VALIDATION (IMPORTANT) -------------------- */
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    /* -------------------- DATABASE -------------------- */
     runtimeOnly 'org.postgresql:postgresql'
     // runtimeOnly 'mysql:mysql-connector-j'
 
-    // Lombok
+    /* -------------------- LOMBOK -------------------- */
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    // Testing
+    /* -------------------- TESTING -------------------- */
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
 }
 
 tasks.named('test') {
