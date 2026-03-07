@@ -1,0 +1,15 @@
+package com.project.hiveSpace.dto;
+
+import com.project.hiveSpace.models.Role;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+
+@Getter
+@AllArgsConstructor
+public class UserResponse {
+
+    private Long id;
+    private String email;
+    private String username;
+    private Role role;
+}
