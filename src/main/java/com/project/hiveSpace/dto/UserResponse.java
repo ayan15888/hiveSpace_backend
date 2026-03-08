@@ -8,7 +8,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserResponse {
 
-    private Long id;
+    private java.util.UUID id;
     private String email;
     private String username;
     private Role role;

@@ -16,8 +16,8 @@ import lombok.*;
 public class User {
 
         @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        private Long id;
+        @GeneratedValue(strategy = GenerationType.UUID)
+        private java.util.UUID id;
 
         @Column(nullable = false)
         private String email;
@@ -37,7 +37,7 @@ public class User {
         @Column(nullable = false)
         private Role role;
 
-        // @ManyToOne(fetch = FetchType.LAZY)
-        // @JoinColumn(name = "tenant_id")
-        // private Tenant tenant;
+        @ManyToOne(fetch = FetchType.LAZY)
+        @JoinColumn(name = "tenant_id")
+        private Tenant tenant;
 }

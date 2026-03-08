@@ -3,12 +3,10 @@ package com.project.hiveSpace.repository;
 import com.project.hiveSpace.models.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository extends JpaRepository<User, java.util.UUID> {
 
     Optional<User> findByEmail(String email);
 
@@ -16,7 +14,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByUsername(String username);
 
-//    List<User> findByTenantId(Long tenantId);
+    java.util.List<User> findByTenantId(java.util.UUID tenantId);
 
-//    List<User> findByTenantIdAndActiveTrue(Long tenantId);
+    java.util.List<User> findByTenantIdAndActiveTrue(java.util.UUID tenantId);
 }
