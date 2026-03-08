@@ -172,7 +172,7 @@ Tenant
 
 ### Tools
 - Lombok
-- Maven
+- Gradle
 - Postman
 
 ---
