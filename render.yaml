@@ -1,0 +1,25 @@
+services:
+  - type: web
+    name: hivespace-backend
+    env: docker
+    region: oregon
+    # No buildCommand/startCommand needed for Docker environment
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hivespace-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: hivespace-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: hivespace-db
+          property: password
+
+databases:
+  - name: hivespace-db
+    databaseName: hivespace_db
+    user: hivespace_admin
+    plan: free
