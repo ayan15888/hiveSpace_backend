@@ -1,0 +1,23 @@
+name: HiveSpace Keep-Alive
+
+on:
+  schedule:
+    # Run every 15 minutes to keep Render Free Tier awake
+    - cron: '*/15 * * * *'
+  # Also allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Wakeup Call
+        run: |
+          echo "Sending ping to Render service..."
+          RESPONSE=$(curl -s -L -w "%{http_code}" "${{ secrets.RENDER_SERVICE_URL }}/api/health" -o /dev/null)
+          if [ "$RESPONSE" -eq 200 ]; then
+            echo "✅ Success! Server is AWAKE and HEALTHY (Status: $RESPONSE)"
+          else
+            echo "⚠️ Warning! Server returned Status: $RESPONSE"
+            exit 1
+          fi
