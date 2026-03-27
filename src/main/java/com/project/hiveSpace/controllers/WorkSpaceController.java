@@ -1,19 +1,31 @@
-// package com.project.hiveSpace.controllers;
+package com.project.hiveSpace.controllers;
 
-// import com.project.hiveSpace.dto.WorkspaceRequest;
-// import com.project.hiveSpace.dto.WorkspaceResponse;
-// import com.project.hiveSpace.services.WorkspaceService;
-// import jakarta.validation.Valid;
-// import org.springframework.beans.factory.annotation.Autowired;
-// import org.springframework.http.ResponseEntity;
-// import org.springframework.web.bind.annotation.*;
+import com.project.hiveSpace.dto.WorkspaceRequest;
+import com.project.hiveSpace.dto.WorkspaceResponse;
+import com.project.hiveSpace.services.WorkspaceService;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-// import java.util.List;
-// import java.util.UUID;
+import java.util.List;
+import java.util.UUID;
 
-// @RestController
-// @RequestMapping("/api/workspaces")
-// @CrossOrigin(origins = "*")
-// public class WorkSpaceController {
+@RestController
+@RequestMapping("/api/workspaces")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*")
+public class WorkSpaceController {
 
-// }
+    private final WorkspaceService workspaceService;
+
+    @PostMapping
+    public ResponseEntity<WorkspaceResponse> createWorkspace(@Valid @RequestBody WorkspaceRequest request) {
+        return ResponseEntity.ok(workspaceService.createWorkspace(request));
+    }
+
+    @GetMapping("/tenant/{tenantId}")
+    public ResponseEntity<List<WorkspaceResponse>> getWorkspacesByTenant(@PathVariable UUID tenantId) {
+        return ResponseEntity.ok(workspaceService.getWorkspacesByTenant(tenantId));
+    }
+}
