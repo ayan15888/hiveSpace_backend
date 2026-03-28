@@ -23,6 +23,7 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/tenants/**").permitAll()
                         .requestMatchers("/api/workspaces/**").permitAll()
+                        .requestMatchers("/api/*/workspaces/*/projects/**").permitAll()
                         .requestMatchers("/api/health").permitAll()
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
