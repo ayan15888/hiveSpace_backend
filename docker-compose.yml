@@ -8,10 +8,12 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Link to the DB service below
-      DATABASE_URL: jdbc:postgresql://postgres:5432/hivespace_db
-      DB_USERNAME: postgres
-      DB_PASSWORD: password
+      # Use your Supabase string here for testing!
+      # Remember to add: ?sslmode=require
+      DATABASE_URL: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require
+      # Use postgres.[YOUR_PROJECT_REF]
+      DB_USERNAME: postgres.abc-your-project-ref
+      DB_PASSWORD: your_supabase_password
     depends_on:
       postgres:
         condition: service_healthy
