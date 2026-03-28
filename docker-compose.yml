@@ -10,7 +10,7 @@ services:
     environment:
       # Use your Supabase string here for testing!
       # Remember to add: ?sslmode=require
-      DATABASE_URL: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:6543/postgres?sslmode=require
+      DATABASE_URL: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
       # Use postgres.[YOUR_PROJECT_REF]
       DB_USERNAME: postgres.abc-your-project-ref
       DB_PASSWORD: your_supabase_password
