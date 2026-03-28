@@ -8,12 +8,10 @@ services:
     ports:
       - "8080:8080"
     environment:
-      # Use your Supabase string here for testing!
-      # Remember to add: ?sslmode=require
-      DATABASE_URL: jdbc:postgresql://aws-1-ap-south-1.pooler.supabase.com:5432/postgres?sslmode=require
-      # Use postgres.[YOUR_PROJECT_REF]
-      DB_USERNAME: postgres.abc-your-project-ref
-      DB_PASSWORD: your_supabase_password
+      # Use Neon.tech string here for testing!
+      DATABASE_URL: jdbc:postgresql://ep-orange-sunset-am84peh2-pooler.c-5.us-east-1.aws.neon.tech/neondb?sslmode=require
+      DB_USERNAME: neondb_owner
+      DB_PASSWORD: npg_E8eazUXNnv5R
     depends_on:
       postgres:
         condition: service_healthy
