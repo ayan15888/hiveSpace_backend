@@ -1,0 +1,127 @@
+# HiveSpace Backend API Documentation
+
+This document outlines all the available API endpoints in the HiveSpace backend, detailing the required headers, path parameters, and request bodies needed to connect it with your frontend.
+
+### General Headers
+For most requests, the following headers are generally expected:
+*   **`Content-Type`**: `application/json` (Required for all `POST` requests with a Body).
+*   **`Authorization`**: `Bearer <your_jwt_token>` (Required for all protected endpoints. Exclude for `/api/auth/*` and `/api/health`).
+
+---
+
+## 1. Authentication (`UserController`)
+
+### Register a User
+*   **Method:** `POST`
+*   **Endpoint:** `/api/auth/register`
+*   **Headers:** `Content-Type: application/json`
+*   **Body (`RegisterRequest`):**
+    ```json
+    {
+      "email": "user@example.com",     // Required, valid email
+      "username": "john_doe",          // Required, 3-50 characters
+      "password": "securepassword123"  // Required, min 6 characters
+    }
+    ```
+
+### Login a User
+*   **Method:** `POST`
+*   **Endpoint:** `/api/auth/login`
+*   **Headers:** `Content-Type: application/json`
+*   **Body (`LoginRequest`):**
+    ```json
+    {
+      "email": "user@example.com", // Required, valid email
+      "password": "yourpassword"   // Required
+    }
+    ```
+
+---
+
+## 2. Health Check (`HealthController`)
+
+### Check API Status
+*   **Method:** `GET`
+*   **Endpoint:** `/api/health`
+*   **Headers:** None required.
+*   **Response:**
+    ```json
+    {
+      "status": "UP",
+      "timestamp": "2026-03-30T10:15:30",
+      "message": "HiveSpace Backend is running smoothly"
+    }
+    ```
+
+---
+
+## 3. Tenants (`TenantController`)
+
+### Create a Tenant
+*   **Method:** `POST`
+*   **Endpoint:** `/api/tenants`
+*   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
+*   **Body (`TenantRequest`):**
+    ```json
+    {
+      "name": "My Organization",       // Required
+      "slug": "my-org",                // Required
+      "ownerEmail": "owner@email.com", // Required, valid email
+      "plan": "FREE",                  // Optional (Default: FREE)
+      "description": "Optional desc"   // Optional
+    }
+    ```
+
+---
+
+## 4. Workspaces (`WorkSpaceController`)
+
+### Create a Workspace
+*   **Method:** `POST`
+*   **Endpoint:** `/api/workspaces`
+*   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
+*   **Body (`WorkspaceRequest`):**
+    ```json
+    {
+      "name": "Development Workspace",       // Required
+      "description": "Optional description", // Optional
+      "plan": "BASIC",                       // Required
+      "tenantId": "123e4567-e89b-12d3..."    // Required, UUID of the Tenant
+    }
+    ```
+
+### Get Workspaces by Tenant
+*   **Method:** `GET`
+*   **Endpoint:** `/api/workspaces/tenant/{tenantId}`
+*   **Path Variables:**
+    *   `tenantId` (UUID): The ID of the Tenant.
+*   **Headers:** `Authorization: Bearer <token>`
+
+---
+
+## 5. Projects (`ProjectController`)
+
+### Create a Project
+*   **Method:** `POST`
+*   **Endpoint:** `/api/{tenantSlug}/workspaces/{workspaceId}/projects`
+*   **Path Variables:**
+    *   `tenantSlug` (String): The slug of the Tenant.
+    *   `workspaceId` (UUID): The ID of the Workspace.
+*   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
+*   **Body (`ProjectRequest`):**
+    ```json
+    {
+      "name": "New Project",                  // Required
+      "description": "Project description",   // Optional
+      "status": "ACTIVE",                     // Required
+      "workspaceId": "123e4567-e89b-12d3..."  // Required, UUID
+    }
+    ```
+
+### Get Projects by Workspace
+*   **Method:** `GET`
+*   **Endpoint:** `/api/{tenantSlug}/workspaces/{workspaceId}/projects`
+*   **Path Variables:**
+    *   `tenantSlug` (String): The slug of the Tenant.
+    *   `workspaceId` (UUID): The ID of the Workspace.
+*   **Headers:** `Authorization: Bearer <token>`
