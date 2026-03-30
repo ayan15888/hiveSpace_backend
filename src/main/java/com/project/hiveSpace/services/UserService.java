@@ -4,6 +4,7 @@ import com.project.hiveSpace.dto.UserResponse;
 import com.project.hiveSpace.models.Role;
 import com.project.hiveSpace.models.User;
 import com.project.hiveSpace.repository.UserRepository;
+import com.project.hiveSpace.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
     // REGISTER
@@ -32,7 +34,9 @@ public class UserService {
 
         userRepository.save(user);
 
-        return toResponse(user);
+        var jwtToken = jwtService.generateToken(user);
+
+        return toResponse(user, jwtToken);
     }
 
     // LOGIN
@@ -51,15 +55,17 @@ public class UserService {
             throw new IllegalArgumentException("User is inactive");
         }
 
-        return toResponse(user);
+        var jwtToken = jwtService.generateToken(user);
+        return toResponse(user, jwtToken);
     }
 
-    private UserResponse toResponse(User user) {
+    private UserResponse toResponse(User user, String token) {
         return new UserResponse(
                 user.getId(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getRole()
+                user.getRole(),
+                token
         );
     }
 }
