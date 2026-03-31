@@ -91,8 +91,44 @@ For most requests, the following headers are generally expected:
     ```bash
     curl -X POST http://localhost:8080/api/tenants \
       -H "Content-Type: application/json" \
-      -H "Authorization: Bearer <your_jwt_token>" \
       -d '{"name": "My Organization", "slug": "my-org", "ownerEmail": "owner@email.com", "plan": "FREE", "description": "Optional desc"}'
+    ```
+
+### Get Organizations by User ID
+*   **Method:** `GET`
+*   **Endpoint:** `/api/tenants/user/{userId}`
+*   **Path Variables:**
+    *   `userId` (UUID): The owner's User ID.
+*   **Headers:** `Authorization: Bearer <token>`
+*   **Response:**
+    ```json
+    [
+      {
+        "id": "123e4567-e89b-12d3...",
+        "name": "My Organization",
+        "slug": "my-org",
+        "ownerEmail": "owner@email.com",
+        "plan": "FREE",
+        "active": true
+      }
+    ]
+    ```
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/tenants/user/550e8400-e29b-41d4-a716-446655440000 \
+      -H "Authorization: Bearer <your_jwt_token>"
+    ```
+
+### Get Tenant Count by User ID
+*   **Method:** `GET`
+*   **Endpoint:** `/api/tenants/count/{userId}`
+*   **Path Variables:**
+    *   `userId` (UUID): The owner's User ID.
+*   **Headers:** `Authorization: Bearer <token>`
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/tenants/count/550e8400-e29b-41d4-a716-446655440000 \
+      -H "Authorization: Bearer <your_jwt_token>"
     ```
 
 ---
