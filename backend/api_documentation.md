@@ -23,6 +23,12 @@ For most requests, the following headers are generally expected:
       "password": "securepassword123"  // Required, min 6 characters
     }
     ```
+*   **cURL Example:**
+    ```bash
+    curl -X POST http://localhost:8080/api/auth/register \
+      -H "Content-Type: application/json" \
+      -d '{"email": "user@example.com", "username": "john_doe", "password": "securepassword123"}'
+    ```
 
 ### Login a User
 *   **Method:** `POST`
@@ -34,6 +40,12 @@ For most requests, the following headers are generally expected:
       "email": "user@example.com", // Required, valid email
       "password": "yourpassword"   // Required
     }
+    ```
+*   **cURL Example:**
+    ```bash
+    curl -X POST http://localhost:8080/api/auth/login \
+      -H "Content-Type: application/json" \
+      -d '{"email": "user@example.com", "password": "yourpassword"}'
     ```
 
 ---
@@ -51,6 +63,10 @@ For most requests, the following headers are generally expected:
       "timestamp": "2026-03-30T10:15:30",
       "message": "HiveSpace Backend is running smoothly"
     }
+    ```
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/health
     ```
 
 ---
@@ -71,6 +87,49 @@ For most requests, the following headers are generally expected:
       "description": "Optional desc"   // Optional
     }
     ```
+*   **cURL Example:**
+    ```bash
+    curl -X POST http://localhost:8080/api/tenants \
+      -H "Content-Type: application/json" \
+      -d '{"name": "My Organization", "slug": "my-org", "ownerEmail": "owner@email.com", "plan": "FREE", "description": "Optional desc"}'
+    ```
+
+### Get Organizations by User ID
+*   **Method:** `GET`
+*   **Endpoint:** `/api/tenants/user/{userId}`
+*   **Path Variables:**
+    *   `userId` (UUID): The owner's User ID.
+*   **Headers:** `Authorization: Bearer <token>`
+*   **Response:**
+    ```json
+    [
+      {
+        "id": "123e4567-e89b-12d3...",
+        "name": "My Organization",
+        "slug": "my-org",
+        "ownerEmail": "owner@email.com",
+        "plan": "FREE",
+        "active": true
+      }
+    ]
+    ```
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/tenants/user/550e8400-e29b-41d4-a716-446655440000 \
+      -H "Authorization: Bearer <your_jwt_token>"
+    ```
+
+### Get Tenant Count by User ID
+*   **Method:** `GET`
+*   **Endpoint:** `/api/tenants/count/{userId}`
+*   **Path Variables:**
+    *   `userId` (UUID): The owner's User ID.
+*   **Headers:** `Authorization: Bearer <token>`
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/tenants/count/550e8400-e29b-41d4-a716-446655440000 \
+      -H "Authorization: Bearer <your_jwt_token>"
+    ```
 
 ---
 
@@ -89,6 +148,13 @@ For most requests, the following headers are generally expected:
       "tenantId": "123e4567-e89b-12d3..."    // Required, UUID of the Tenant
     }
     ```
+*   **cURL Example:**
+    ```bash
+    curl -X POST http://localhost:8080/api/workspaces \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your_jwt_token>" \
+      -d '{"name": "Development Workspace", "description": "Optional description", "plan": "BASIC", "tenantId": "123e4567-e89b-12d3..."}'
+    ```
 
 ### Get Workspaces by Tenant
 *   **Method:** `GET`
@@ -96,6 +162,11 @@ For most requests, the following headers are generally expected:
 *   **Path Variables:**
     *   `tenantId` (UUID): The ID of the Tenant.
 *   **Headers:** `Authorization: Bearer <token>`
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/workspaces/tenant/{tenantId} \
+      -H "Authorization: Bearer <your_jwt_token>"
+    ```
 
 ---
 
@@ -117,6 +188,13 @@ For most requests, the following headers are generally expected:
       "workspaceId": "123e4567-e89b-12d3..."  // Required, UUID
     }
     ```
+*   **cURL Example:**
+    ```bash
+    curl -X POST http://localhost:8080/api/{tenantSlug}/workspaces/{workspaceId}/projects \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your_jwt_token>" \
+      -d '{"name": "New Project", "description": "Project description", "status": "ACTIVE", "workspaceId": "123e4567-e89b-12d3..."}'
+    ```
 
 ### Get Projects by Workspace
 *   **Method:** `GET`
@@ -125,3 +203,8 @@ For most requests, the following headers are generally expected:
     *   `tenantSlug` (String): The slug of the Tenant.
     *   `workspaceId` (UUID): The ID of the Workspace.
 *   **Headers:** `Authorization: Bearer <token>`
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/{tenantSlug}/workspaces/{workspaceId}/projects \
+      -H "Authorization: Bearer <your_jwt_token>"
+    ```

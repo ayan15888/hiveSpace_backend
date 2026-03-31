@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/tenants")
 @RequiredArgsConstructor
@@ -18,5 +21,15 @@ public class TenantController {
     @PostMapping
     public ResponseEntity<TenantResponse> createTenant(@Valid @RequestBody TenantRequest request) {
         return ResponseEntity.ok(tenantService.createTenant(request));
+    }
+
+    @GetMapping("/count/{userId}")
+    public ResponseEntity<Long> getTenantCountByEmail(@PathVariable UUID userId) {
+        return ResponseEntity.ok(tenantService.getTenantCountByOwnerId(userId));
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<TenantResponse>> getTenantsByEmail(@PathVariable UUID userId) {
+        return ResponseEntity.ok(tenantService.getTenantsByOwnerId(userId));
     }
 }

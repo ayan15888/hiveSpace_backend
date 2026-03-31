@@ -14,7 +14,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/workspaces")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class WorkSpaceController {
 
     private final WorkspaceService workspaceService;
