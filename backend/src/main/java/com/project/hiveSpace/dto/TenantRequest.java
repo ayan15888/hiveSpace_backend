@@ -1,7 +1,6 @@
 package com.project.hiveSpace.dto;
 
 import com.project.hiveSpace.models.Plan;
-import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,10 +16,6 @@ public class TenantRequest {
 
     @NotBlank(message = "Slug is required")
     private String slug;
-
-    @NotBlank(message = "Owner email is required")
-    @Email(message = "Invalid email format")
-    private String ownerEmail;
 
     private Plan plan = Plan.FREE;
 

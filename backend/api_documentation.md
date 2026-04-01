@@ -5,7 +5,7 @@ This document outlines all the available API endpoints in the HiveSpace backend,
 ### General Headers
 For most requests, the following headers are generally expected:
 *   **`Content-Type`**: `application/json` (Required for all `POST` requests with a Body).
-*   **`Authorization`**: `Bearer <your_jwt_token>` (Required for all protected endpoints. Exclude for `/api/auth/*` and `/api/health`).
+*   **`Authorization`**: `Bearer <your_jwt_token>` (Required for all protected endpoints. Exclude for `/api/auth/**`, `/api/health`, and `/error`).
 
 ---
 
@@ -82,16 +82,17 @@ For most requests, the following headers are generally expected:
     {
       "name": "My Organization",       // Required
       "slug": "my-org",                // Required
-      "ownerEmail": "owner@email.com", // Required, valid email
       "plan": "FREE",                  // Optional (Default: FREE)
       "description": "Optional desc"   // Optional
     }
     ```
+*   **Note**: The owner is automatically assigned based on the authenticated user's JWT token.
 *   **cURL Example:**
     ```bash
     curl -X POST http://localhost:8080/api/tenants \
       -H "Content-Type: application/json" \
-      -d '{"name": "My Organization", "slug": "my-org", "ownerEmail": "owner@email.com", "plan": "FREE", "description": "Optional desc"}'
+      -H "Authorization: Bearer <your_jwt_token>" \
+      -d '{"name": "My Organization", "slug": "my-org", "plan": "FREE", "description": "Optional desc"}'
     ```
 
 ### Get Organizations by User ID
@@ -100,6 +101,7 @@ For most requests, the following headers are generally expected:
 *   **Path Variables:**
     *   `userId` (UUID): The owner's User ID.
 *   **Headers:** `Authorization: Bearer <token>`
+*   **Requirement**: The `userId` must match the authenticated user's ID.
 *   **Response:**
     ```json
     [
@@ -125,6 +127,7 @@ For most requests, the following headers are generally expected:
 *   **Path Variables:**
     *   `userId` (UUID): The owner's User ID.
 *   **Headers:** `Authorization: Bearer <token>`
+*   **Requirement**: The `userId` must match the authenticated user's ID.
 *   **cURL Example:**
     ```bash
     curl -X GET http://localhost:8080/api/tenants/count/550e8400-e29b-41d4-a716-446655440000 \
@@ -171,7 +174,7 @@ For most requests, the following headers are generally expected:
 ---
 
 ## 5. Projects (`ProjectController`)
-
+prc
 ### Create a Project
 *   **Method:** `POST`
 *   **Endpoint:** `/api/workspaces/{workspaceId}/projects`

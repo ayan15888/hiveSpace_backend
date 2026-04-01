@@ -3,8 +3,10 @@ package com.project.hiveSpace.services;
 import com.project.hiveSpace.dto.TenantRequest;
 import com.project.hiveSpace.dto.TenantResponse;
 import com.project.hiveSpace.models.Tenant;
+import com.project.hiveSpace.models.User;
 import com.project.hiveSpace.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,8 @@ public class TenantService {
 
     @Transactional
     public TenantResponse createTenant(TenantRequest request) {
+        User currentUser = getCurrentUser();
+
         if (tenantRepository.findByName(request.getName()).isPresent()) {
             throw new IllegalArgumentException("Organization name already exists");
         }
@@ -31,7 +35,7 @@ public class TenantService {
         Tenant tenant = Tenant.builder()
                 .name(request.getName())
                 .slug(request.getSlug())
-                .ownerEmail(request.getOwnerEmail())
+                .ownerEmail(currentUser.getEmail())
                 .plan(request.getPlan())
                 .description(request.getDescription())
                 .active(true)
@@ -39,6 +43,14 @@ public class TenantService {
 
         Tenant savedTenant = tenantRepository.save(tenant);
         return mapToResponse(savedTenant);
+    }
+
+    private User getCurrentUser() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if (principal instanceof User) {
+            return (User) principal;
+        }
+        throw new IllegalStateException("User not authenticated");
     }
 
     private TenantResponse mapToResponse(Tenant tenant) {
@@ -53,18 +65,25 @@ public class TenantService {
     }
 
     public long getTenantCountByOwnerId(UUID userId) {
-        String email = userRepository.findById(userId)
-                .map(com.project.hiveSpace.models.User::getEmail)
+        validateOwnership(userId);
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return tenantRepository.countByOwnerEmail(email);
+        return tenantRepository.countByOwnerEmail(user.getEmail());
     }
 
     public List<TenantResponse> getTenantsByOwnerId(UUID userId) {
-        String email = userRepository.findById(userId)
-                .map(com.project.hiveSpace.models.User::getEmail)
+        validateOwnership(userId);
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return tenantRepository.findAllByOwnerEmail(email).stream()
+        return tenantRepository.findAllByOwnerEmail(user.getEmail()).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    private void validateOwnership(UUID userId) {
+        User currentUser = getCurrentUser();
+        if (!currentUser.getId().equals(userId)) {
+            throw new IllegalArgumentException("You are not authorized to view these organizations");
+        }
     }
 }
