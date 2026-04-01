@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/{tenantSlug}/workspaces/{workspaceId}/projects")
+@RequestMapping("/api/workspaces/{workspaceId}/projects")
 @RequiredArgsConstructor
 public class ProjectController {
 
@@ -20,16 +20,14 @@ public class ProjectController {
 
     @PostMapping
     public ResponseEntity<ProjectResponse> createProject(
-            @PathVariable String tenantSlug,
             @PathVariable UUID workspaceId,
             @Valid @RequestBody ProjectRequest request) {
-        return ResponseEntity.ok(projectService.createProject(tenantSlug, workspaceId, request));
+        return ResponseEntity.ok(projectService.createProject(workspaceId, request));
     }
 
     @GetMapping
     public ResponseEntity<List<ProjectResponse>> getProjectsByWorkspace(
-            @PathVariable String tenantSlug,
             @PathVariable UUID workspaceId) {
-        return ResponseEntity.ok(projectService.getProjectsByWorkspace(tenantSlug, workspaceId));
+        return ResponseEntity.ok(projectService.getProjectsByWorkspace(workspaceId));
     }
 }

@@ -28,7 +28,7 @@ public class TenantController {
         return ResponseEntity.ok(tenantService.getTenantCountByOwnerId(userId));
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/u/{userId}")
     public ResponseEntity<List<TenantResponse>> getTenantsByEmail(@PathVariable UUID userId) {
         return ResponseEntity.ok(tenantService.getTenantsByOwnerId(userId));
     }

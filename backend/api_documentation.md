@@ -96,7 +96,7 @@ For most requests, the following headers are generally expected:
 
 ### Get Organizations by User ID
 *   **Method:** `GET`
-*   **Endpoint:** `/api/tenants/user/{userId}`
+*   **Endpoint:** `/api/tenants/u/{userId}`
 *   **Path Variables:**
     *   `userId` (UUID): The owner's User ID.
 *   **Headers:** `Authorization: Bearer <token>`
@@ -115,7 +115,7 @@ For most requests, the following headers are generally expected:
     ```
 *   **cURL Example:**
     ```bash
-    curl -X GET http://localhost:8080/api/tenants/user/550e8400-e29b-41d4-a716-446655440000 \
+    curl -X GET http://localhost:8080/api/tenants/u/550e8400-e29b-41d4-a716-446655440000 \
       -H "Authorization: Bearer <your_jwt_token>"
     ```
 
@@ -174,9 +174,8 @@ For most requests, the following headers are generally expected:
 
 ### Create a Project
 *   **Method:** `POST`
-*   **Endpoint:** `/api/{tenantSlug}/workspaces/{workspaceId}/projects`
+*   **Endpoint:** `/api/workspaces/{workspaceId}/projects`
 *   **Path Variables:**
-    *   `tenantSlug` (String): The slug of the Tenant.
     *   `workspaceId` (UUID): The ID of the Workspace.
 *   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
 *   **Body (`ProjectRequest`):**
@@ -190,7 +189,7 @@ For most requests, the following headers are generally expected:
     ```
 *   **cURL Example:**
     ```bash
-    curl -X POST http://localhost:8080/api/{tenantSlug}/workspaces/{workspaceId}/projects \
+    curl -X POST http://localhost:8080/api/workspaces/{workspaceId}/projects \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <your_jwt_token>" \
       -d '{"name": "New Project", "description": "Project description", "status": "ACTIVE", "workspaceId": "123e4567-e89b-12d3..."}'
@@ -198,13 +197,37 @@ For most requests, the following headers are generally expected:
 
 ### Get Projects by Workspace
 *   **Method:** `GET`
-*   **Endpoint:** `/api/{tenantSlug}/workspaces/{workspaceId}/projects`
+*   **Endpoint:** `/api/workspaces/{workspaceId}/projects`
 *   **Path Variables:**
-    *   `tenantSlug` (String): The slug of the Tenant.
     *   `workspaceId` (UUID): The ID of the Workspace.
 *   **Headers:** `Authorization: Bearer <token>`
 *   **cURL Example:**
     ```bash
-    curl -X GET http://localhost:8080/api/{tenantSlug}/workspaces/{workspaceId}/projects \
+    curl -X GET http://localhost:8080/api/workspaces/{workspaceId}/projects \
+      -H "Authorization: Bearer <your_jwt_token>"
+    ```
+
+---
+
+## 6. Profiles (`ProfileController`)
+
+### Get Current User Profile
+*   **Method:** `GET`
+*   **Endpoint:** `/api/profile`
+*   **Headers:** `Authorization: Bearer <token>`
+*   **Description:** Returns the profile of the currently authenticated user.
+*   **Response:**
+    ```json
+    {
+      "id": "123e4567-e89b-12d3...",
+      "email": "user@example.com",
+      "username": "john_doe",
+      "role": "USER",
+      "token": null
+    }
+    ```
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/profile \
       -H "Authorization: Bearer <your_jwt_token>"
     ```

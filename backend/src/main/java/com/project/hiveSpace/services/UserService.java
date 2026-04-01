@@ -59,6 +59,12 @@ public class UserService {
         return toResponse(user, jwtToken);
     }
 
+    public UserResponse getProfile(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        return toResponse(user, null);
+    }
+
     private UserResponse toResponse(User user, String token) {
         return new UserResponse(
                 user.getId(),

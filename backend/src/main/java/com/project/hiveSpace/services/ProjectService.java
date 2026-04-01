@@ -21,19 +21,11 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final WorkspaceRepository workspaceRepository;
-    private final com.project.hiveSpace.repository.TenantRepository tenantRepository;
 
     @Transactional
-    public ProjectResponse createProject(String tenantSlug, UUID workspaceId, ProjectRequest request) {
-        com.project.hiveSpace.models.Tenant tenant = tenantRepository.findBySlug(tenantSlug)
-                .orElseThrow(() -> new IllegalArgumentException("Tenant with slug not found"));
-
+    public ProjectResponse createProject(UUID workspaceId, ProjectRequest request) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new IllegalArgumentException("Workspace not found"));
-
-        if (!workspace.getTenant().getId().equals(tenant.getId())) {
-             throw new IllegalArgumentException("Workspace does not belong to the given tenant");
-        }
 
         if (projectRepository.existsByNameAndWorkspace(request.getName(), workspace)) {
             throw new IllegalArgumentException(
@@ -55,16 +47,9 @@ public class ProjectService {
         return mapToResponse(savedProject);
     }
 
-    public List<ProjectResponse> getProjectsByWorkspace(String tenantSlug, UUID workspaceId) {
-        com.project.hiveSpace.models.Tenant tenant = tenantRepository.findBySlug(tenantSlug)
-                .orElseThrow(() -> new IllegalArgumentException("Tenant with slug not found"));
-
+    public List<ProjectResponse> getProjectsByWorkspace(UUID workspaceId) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new IllegalArgumentException("Workspace not found"));
-
-        if (!workspace.getTenant().getId().equals(tenant.getId())) {
-            throw new IllegalArgumentException("Workspace does not belong to the given tenant");
-        }
 
         return projectRepository.findAllByWorkspace(workspace)
                 .stream()
