@@ -2,6 +2,22 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@font-face {
+  font-family: "EB Garamond HS";
+  src: url("/fonts/EBGaramond.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "EB Garamond HS";
+  src: url("/fonts/EBGaramonditalic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -46,6 +62,9 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
 }
 
 :root {
@@ -61,7 +80,8 @@
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
   --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
+  --accent: #FACC15;
+  --accent-soft: #FEF9C3;
   --accent-foreground: oklch(0.205 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --border: oklch(0.922 0 0);
@@ -123,8 +143,74 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: "EB Garamond HS", ui-serif, Georgia, "Times New Roman", serif;
   }
   html {
-    @apply font-sans;
+    font-family: "EB Garamond HS", ui-serif, Georgia, "Times New Roman", serif;
+    scroll-behavior: smooth;
+  }
+}
+
+@layer utilities {
+  .font-brand-italic {
+    font-family: "EB Garamond HS Italic", "EB Garamond HS", ui-serif, Georgia, "Times New Roman", serif;
+    font-style: italic;
+  }
+
+  .marquee-container {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .marquee-track {
+    display: inline-flex;
+    white-space: nowrap;
+    animation: marquee-scroll 28s linear infinite;
+  }
+
+  @keyframes marquee-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes hs-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-6px);
+    }
+  }
+
+  @keyframes hs-rotate {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes hs-shimmer {
+    0% {
+      transform: translateX(-30%);
+    }
+    100% {
+      transform: translateX(130%);
+    }
+  }
+
+  .hs-float {
+    animation: hs-float 1.6s ease-in-out infinite;
+  }
+
+  .hs-rotate {
+    animation: hs-rotate 1.9s linear infinite;
+  }
+
+  .hs-shimmer {
+    animation: hs-shimmer 1.3s ease-in-out infinite;
   }
 }
