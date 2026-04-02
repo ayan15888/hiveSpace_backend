@@ -14,7 +14,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/workspaces")
 @RequiredArgsConstructor
-public class WorkSpaceController {
+public class WorkspaceController {
 
     private final WorkspaceService workspaceService;
 
@@ -23,7 +23,7 @@ public class WorkSpaceController {
         return ResponseEntity.ok(workspaceService.createWorkspace(request));
     }
 
-    @GetMapping("/tenant/{tenantId}")
+    @GetMapping("/t/{tenantId}")
     public ResponseEntity<List<WorkspaceResponse>> getWorkspacesByTenant(@PathVariable UUID tenantId) {
         return ResponseEntity.ok(workspaceService.getWorkspacesByTenant(tenantId));
     }

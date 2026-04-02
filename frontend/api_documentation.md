@@ -208,3 +208,77 @@ For most requests, the following headers are generally expected:
     curl -X GET http://localhost:8080/api/{tenantSlug}/workspaces/{workspaceId}/projects \
       -H "Authorization: Bearer <your_jwt_token>"
     ```
+---
+
+## 7. Teams (`TeamController`)
+
+### Create a Team
+*   **Method:** `POST`
+*   **Endpoint:** `/api/p/{projectId}/teams`
+*   **Path Variables:**
+    *   `projectId` (UUID): The ID of the Project.
+*   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
+*   **Body (`TeamRequest`):**
+    ```json
+    {
+      "name": "Backend Team",           // Required
+      "description": "API & DB work"    // Optional
+    }
+    ```
+*   **cURL Example:**
+    ```bash
+    curl -X POST http://localhost:8080/api/p/{projectId}/teams \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your_jwt_token>" \
+      -d '{"name": "Backend Team", "description": "API & DB work"}'
+    ```
+
+### Get Teams by Project
+*   **Method:** `GET`
+*   **Endpoint:** `/api/p/{projectId}/teams`
+*   **Path Variables:**
+    *   `projectId` (UUID): The ID of the Project.
+*   **Headers:** `Authorization: Bearer <token>`
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/p/{projectId}/teams \
+      -H "Authorization: Bearer <your_jwt_token>"
+    ```
+
+---
+
+## 8. Invitations (`InvitationController`)
+
+### Generate an Invite
+*   **Method:** `POST`
+*   **Endpoint:** `/api/i/generate`
+*   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
+*   **Requirement**: Authenticated user must be a `MANAGER` or `OWNER` of the target workspace.
+*   **Body (`InviteRequest`):**
+    ```json
+    {
+      "teamId": "123e4567-e89b-12d3...",
+      "recipientUsername": "john_guest"
+    }
+    ```
+*   **Response (`InviteResponse`):**
+    ```json
+    {
+      "code": "INV-ABCD-1234",
+      "teamName": "Backend Team",
+      "recipientUsername": "john_guest",
+      "expiresAt": "2026-04-09T18:30:00"
+    }
+    ```
+
+### Join a Team (Accept Invite)
+*   **Method:** `POST`
+*   **Endpoint:** `/api/i/join`
+*   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
+*   **Requirement**: Authenticated user's `username` must match the `recipientUsername` in the invite.
+*   **Body (`JoinRequest`):**
+    ```json
+    {
+      "inviteCode": "INV-ABCD-1234"
+    }
+    ```

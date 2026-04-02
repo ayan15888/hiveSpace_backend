@@ -37,6 +37,9 @@ public class Workspace {
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
 
+    @Column(name = "members_count", nullable = false)
+    private int membersCount;
+
     @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
 }

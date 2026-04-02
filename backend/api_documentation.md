@@ -95,6 +95,20 @@ For most requests, the following headers are generally expected:
       -d '{"name": "My Organization", "slug": "my-org", "plan": "FREE", "description": "Optional desc"}'
     ```
 
+*   **Response (`TenantResponse`):**
+    ```json
+    {
+      "id": "123e4567-e89b-12d3...",
+      "name": "My Organization",
+      "slug": "my-org",
+      "ownerEmail": "owner@email.com",
+      "plan": "FREE",
+      "active": true,
+      "membersCount": 1,
+      "workspacesCount": 0
+    }
+    ```
+
 ### Get Organizations by User ID
 *   **Method:** `GET`
 *   **Endpoint:** `/api/tenants/u/{userId}`
@@ -111,7 +125,9 @@ For most requests, the following headers are generally expected:
         "slug": "my-org",
         "ownerEmail": "owner@email.com",
         "plan": "FREE",
-        "active": true
+        "active": true,
+        "membersCount": 1,
+        "workspacesCount": 0
       }
     ]
     ```
@@ -161,13 +177,13 @@ For most requests, the following headers are generally expected:
 
 ### Get Workspaces by Tenant
 *   **Method:** `GET`
-*   **Endpoint:** `/api/workspaces/tenant/{tenantId}`
+*   **Endpoint:** `/api/workspaces/t/{tenantId}`
 *   **Path Variables:**
     *   `tenantId` (UUID): The ID of the Tenant.
 *   **Headers:** `Authorization: Bearer <token>`
 *   **cURL Example:**
     ```bash
-    curl -X GET http://localhost:8080/api/workspaces/tenant/{tenantId} \
+    curl -X GET http://localhost:8080/api/workspaces/t/{tenantId} \
       -H "Authorization: Bearer <your_jwt_token>"
     ```
 
@@ -233,4 +249,77 @@ prc
     ```bash
     curl -X GET http://localhost:8080/api/profile \
       -H "Authorization: Bearer <your_jwt_token>"
+    ```
+---
+
+## 7. Teams (`TeamController`)
+
+### Create a Team
+*   **Method:** `POST`
+*   **Endpoint:** `/api/p/{projectId}/teams`
+*   **Path Variables:**
+    *   `projectId` (UUID): The ID of the Project.
+*   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
+*   **Body (`TeamRequest`):**
+    ```json
+    {
+      "name": "Backend Team",           // Required
+      "description": "API & DB work"    // Optional
+    }
+    ```
+*   **cURL Example:**
+    ```bash
+    curl -X POST http://localhost:8080/api/p/{projectId}/teams \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer <your_jwt_token>" \
+      -d '{"name": "Backend Team", "description": "API & DB work"}'
+    ```
+
+### Get Teams by Project
+*   **Method:** `GET`
+*   **Endpoint:** `/api/p/{projectId}/teams`
+*   **Path Variables:**
+    *   `projectId` (UUID): The ID of the Project.
+*   **Headers:** `Authorization: Bearer <token>`
+*   **cURL Example:**
+    ```bash
+    curl -X GET http://localhost:8080/api/p/{projectId}/teams \
+      -H "Authorization: Bearer <your_jwt_token>"
+    ```
+---
+
+## 8. Invitations (`InvitationController`)
+
+### Generate an Invite
+*   **Method:** `POST`
+*   **Endpoint:** `/api/i/generate`
+*   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
+*   **Requirement**: Authenticated user must be a `MANAGER` or `OWNER` of the target workspace.
+*   **Body (`InviteRequest`):**
+    ```json
+    {
+      "teamId": "123e4567-e89b-12d3...",
+      "recipientUsername": "john_guest"
+    }
+    ```
+*   **Response (`InviteResponse`):**
+    ```json
+    {
+      "code": "INV-ABCD-1234",
+      "teamName": "Backend Team",
+      "recipientUsername": "john_guest",
+      "expiresAt": "2026-04-09T18:30:00"
+    }
+    ```
+
+### Join a Team (Accept Invite)
+*   **Method:** `POST`
+*   **Endpoint:** `/api/i/join`
+*   **Headers:** `Content-Type: application/json`, `Authorization: Bearer <token>`
+*   **Requirement**: Authenticated user's `username` must match the `recipientUsername` in the invite.
+*   **Body (`JoinRequest`):**
+    ```json
+    {
+      "inviteCode": "INV-ABCD-1234"
+    }
     ```
