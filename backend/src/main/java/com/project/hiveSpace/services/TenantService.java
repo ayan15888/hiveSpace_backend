@@ -39,6 +39,8 @@ public class TenantService {
                 .plan(request.getPlan())
                 .description(request.getDescription())
                 .active(true)
+                .membersCount(1)
+                .workspacesCount(0)
                 .build();
 
         Tenant savedTenant = tenantRepository.save(tenant);
@@ -60,7 +62,9 @@ public class TenantService {
                 tenant.getSlug(),
                 tenant.getOwnerEmail(),
                 tenant.getPlan(),
-                tenant.isActive()
+                tenant.isActive(),
+                tenant.getMembersCount(),
+                tenant.getWorkspacesCount()
         );
     }
 

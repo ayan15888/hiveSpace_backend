@@ -43,14 +43,20 @@ public class WorkspaceService {
                 .build();
 
         Workspace savedWorkspace = workspaceRepository.save(workspace);
+
+        // Increment workspaces count on tenant
+        tenant.setWorkspacesCount(tenant.getWorkspacesCount() + 1);
+        tenantRepository.save(tenant);
+
         return mapToResponse(savedWorkspace);
     }
 
     public List<WorkspaceResponse> getWorkspacesByTenant(UUID tenantId) {
-        Tenant tenant = tenantRepository.findById(tenantId)
-                .orElseThrow(() -> new IllegalArgumentException("Tenant not found"));
+        if (!tenantRepository.existsById(tenantId)) {
+            throw new IllegalArgumentException("Tenant not found");
+        }
 
-        return workspaceRepository.findAllByTenant(tenant)
+        return workspaceRepository.findAllByTenantId(tenantId)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());

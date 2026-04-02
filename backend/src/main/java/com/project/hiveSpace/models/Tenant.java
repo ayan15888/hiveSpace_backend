@@ -40,4 +40,10 @@ public class Tenant {
 
     @Column(length = 500)
     private String description;
+
+    @Column(name = "members_count", nullable = false)
+    private int membersCount;
+
+    @Column(name = "workspaces_count", nullable = false)
+    private int workspacesCount;
 }

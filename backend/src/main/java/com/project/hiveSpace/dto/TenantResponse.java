@@ -15,4 +15,6 @@ public class TenantResponse {
     private String ownerEmail;
     private Plan plan;
     private boolean active;
+    private int membersCount;
+    private int workspacesCount;
 }
