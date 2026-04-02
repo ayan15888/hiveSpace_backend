@@ -33,7 +33,7 @@ export function DashboardKanban() {
   };
 
   return (
-    <Card className="flex-1 overflow-hidden border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+    <Card className="flex h-full flex-col overflow-hidden border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
       <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-100 bg-zinc-50/50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/50">
         <CardTitle className="text-sm font-medium text-zinc-900 dark:text-zinc-50 font-heading tracking-wide">
           HiveSpace v2 — kanban

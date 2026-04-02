@@ -6,7 +6,7 @@ import { MOCK_SPRINT } from "@/lib/mock-data";
 
 export function SprintStatus() {
   return (
-    <Card className="flex flex-col border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 overflow-hidden group">
+    <Card className="flex h-full flex-col border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 overflow-hidden group">
       <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-100 bg-zinc-50/50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/50 transition-colors group-hover:bg-zinc-100/50 dark:group-hover:bg-zinc-800/50">
         <CardTitle className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 font-heading tracking-wide">
           Sprint progress
@@ -50,7 +50,7 @@ import { cn } from "@/lib/utils";
 
 export function TeamWorkload() {
   return (
-    <Card className="flex flex-col border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 overflow-hidden group">
+    <Card className="flex h-full flex-col border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 overflow-hidden group">
       <CardHeader className="flex flex-row items-center justify-between border-b border-zinc-100 bg-zinc-50/50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-900/50 transition-colors group-hover:bg-zinc-100/50 dark:group-hover:bg-zinc-800/50">
         <CardTitle className="text-sm font-semibold text-zinc-900 dark:text-zinc-50 font-heading tracking-wide">
           Team workload

@@ -20,22 +20,22 @@ export default function DashboardPage() {
 
           {/* Middle Row: Kanban & Activity */}
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
-            <section className="lg:col-span-2 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both">
+            <section className="lg:col-span-2 flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100 fill-mode-both">
               <DashboardKanban />
             </section>
             
-            <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
+            <section className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 fill-mode-both">
               <ActivityFeed />
             </section>
           </div>
 
           {/* Bottom Row: Sprint & Team */}
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
+            <section className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 delay-300 fill-mode-both">
               <SprintStatus />
             </section>
             
-            <section className="animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400 fill-mode-both">
+            <section className="flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500 delay-400 fill-mode-both">
               <TeamWorkload />
             </section>
           </div>
