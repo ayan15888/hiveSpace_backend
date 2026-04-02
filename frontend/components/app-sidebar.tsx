@@ -86,7 +86,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <Separator className="mx-4 my-2 w-auto" />
+        <Separator className="mx-4 my-2 w-auto group-data-[collapsible=icon]:hidden" />
 
         <SidebarGroup>
           <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Workspaces</SidebarGroupLabel>
@@ -94,23 +94,23 @@ export function AppSidebar() {
             <SidebarMenu>
               {MOCK_WORKSPACES.map((ws) => (
                 <SidebarMenuItem key={ws.id}>
-                  <SidebarMenuButton>
-                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: ws.color }} />
-                    <span className="text-sm">{ws.name}</span>
+                  <SidebarMenuButton tooltip={ws.name}>
+                    <div className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: ws.color }} />
+                    <span className="text-sm group-data-[collapsible=icon]:hidden">{ws.name}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
               <SidebarMenuItem>
-                <SidebarMenuButton className="text-zinc-500">
-                  <Plus className="h-4 w-4" />
-                  <span className="text-sm">Add workspace</span>
+                <SidebarMenuButton className="text-zinc-500" tooltip="Add workspace">
+                  <Plus className="h-4 w-4 shrink-0" />
+                  <span className="text-sm group-data-[collapsible=icon]:hidden">Add workspace</span>
                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <Separator className="mx-4 my-2 w-auto" />
+        <Separator className="mx-4 my-2 w-auto group-data-[collapsible=icon]:hidden" />
 
         <SidebarGroup>
           <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Projects</SidebarGroupLabel>
@@ -118,9 +118,9 @@ export function AppSidebar() {
             <SidebarMenu>
               {MOCK_PROJECTS.map((project) => (
                 <SidebarMenuItem key={project.id}>
-                  <SidebarMenuButton isActive={project.active}>
-                    <div className="h-2 w-2 rounded-full" style={{ backgroundColor: project.color }} />
-                    <span className={project.active ? "font-medium text-sm" : "text-sm"}>{project.name}</span>
+                  <SidebarMenuButton isActive={project.active} tooltip={project.name}>
+                    <div className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: project.color }} />
+                    <span className={project.active ? "font-medium text-sm group-data-[collapsible=icon]:hidden" : "text-sm group-data-[collapsible=icon]:hidden"}>{project.name}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -128,7 +128,7 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        <Separator className="mx-4 my-2 w-auto" />
+        <Separator className="mx-4 my-2 w-auto group-data-[collapsible=icon]:hidden" />
 
         <SidebarGroup>
           <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Channels</SidebarGroupLabel>
@@ -136,10 +136,12 @@ export function AppSidebar() {
             <SidebarMenu>
               {MOCK_CHANNELS.map((channel) => (
                 <SidebarMenuItem key={channel.id}>
-                  <SidebarMenuButton>
-                    <Hash className="h-4 w-4" />
-                    <span className="flex-1 text-sm">{channel.name}</span>
+                  <SidebarMenuButton tooltip={channel.name}>
+                    <Hash className="h-4 w-4 shrink-0" />
+                    <span className="flex-1 text-sm group-data-[collapsible=icon]:hidden">{channel.name}</span>
+                    <div className="group-data-[collapsible=icon]:hidden">
                     {channel.badge && <Badge variant="secondary" className="h-4 px-1.5 text-[10px] rounded-full">{channel.badge}</Badge>}
+                    </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}

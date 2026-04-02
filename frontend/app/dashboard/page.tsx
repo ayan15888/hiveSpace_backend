@@ -11,8 +11,8 @@ export default function DashboardPage() {
     <div className="flex min-h-screen w-full flex-col font-sans selection:bg-indigo-100 selection:text-indigo-900 dark:selection:bg-indigo-900/30 dark:selection:text-indigo-200">
       <DashboardHeader />
       
-      <main className="flex-1 overflow-y-auto px-5 py-6">
-        <div className="mx-auto flex max-w-[1600px] flex-col gap-5">
+      <main className="flex-1 overflow-y-auto px-6 py-6">
+        <div className="flex w-full flex-col gap-5">
           {/* Top Row: Metrics */}
           <section className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             <DashboardMetrics />
