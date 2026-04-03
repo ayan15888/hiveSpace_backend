@@ -61,6 +61,15 @@ class ApiClient {
   delete<T>(endpoint: string, options?: RequestOptions) {
     return this.request<T>(endpoint, { ...options, method: 'DELETE' })
   }
+  
+  async checkHealth(): Promise<boolean> {
+    try {
+      await fetch(`${BASE_URL}/api/health`)
+      return true
+    } catch {
+      return false
+    }
+  }
 }
 
 export const apiClient = new ApiClient()

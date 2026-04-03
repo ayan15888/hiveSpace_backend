@@ -56,8 +56,15 @@ interface WorkspaceState {
 
   fetchTenants: (userId: string) => Promise<void>
   fetchWorkspaces: (tenantId: string) => Promise<void>
-  fetchProjects: (tenantSlug: string, workspaceId: string) => Promise<void>
+  fetchProjects: (workspaceId: string) => Promise<void>
   fetchTeams: (projectId: string) => Promise<void>
+  
+  createTenant: (data: { name: string, slug: string, plan?: string, description?: string }) => Promise<void>
+  createWorkspace: (data: { name: string, description?: string, plan: string, tenantId: string }) => Promise<void>
+  createProject: (data: { name: string, description?: string, status: string, workspaceId: string }) => Promise<void>
+  
+  generateInvite: (teamId: string, recipientUsername: string) => Promise<string>
+  joinTeam: (inviteCode: string) => Promise<void>
   
   setActiveTenant: (tenant: Tenant) => void
   setActiveWorkspace: (workspace: Workspace) => void
@@ -80,7 +87,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   fetchTenants: async (userId) => {
     set({ isLoading: true, error: null })
     try {
-      const response = await apiClient.get<Tenant[]>(`/api/tenants/user/${userId}`)
+      const response = await apiClient.get<Tenant[]>(`/api/tenants/u/${userId}`)
       set({ tenants: response, isLoading: false })
       
       if (response.length > 0 && !get().activeTenant) {
@@ -94,7 +101,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   fetchWorkspaces: async (tenantId) => {
     set({ isLoading: true, error: null })
     try {
-      const response = await apiClient.get<Workspace[]>(`/api/workspaces/tenant/${tenantId}`)
+      const response = await apiClient.get<Workspace[]>(`/api/workspaces/t/${tenantId}`)
       
       const colors = ["#534AB7", "#1D9E75", "#D85A30", "#378ADD", "#EF9F27"]
       const enhancedWorkspaces = response.map((ws, i) => ({
@@ -114,10 +121,10 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     }
   },
 
-  fetchProjects: async (tenantSlug, workspaceId) => {
+  fetchProjects: async (workspaceId) => {
     set({ isLoading: true, error: null })
     try {
-      const response = await apiClient.get<Project[]>(`/api/${tenantSlug}/workspaces/${workspaceId}/projects`)
+      const response = await apiClient.get<Project[]>(`/api/workspaces/${workspaceId}/projects`)
       
       const colors = ["#378ADD", "#EF9F27", "#D4537E", "#1D9E75"]
       const enhancedProjects = response.map((p, i) => ({
@@ -140,10 +147,77 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   fetchTeams: async (projectId) => {
     set({ isLoading: true, error: null })
     try {
+      // NOTE: API_REFERENCE.md doesn't explicitly list "Get Teams", keeping current implementation
       const response = await apiClient.get<Team[]>(`/api/p/${projectId}/teams`)
       set({ teams: response, isLoading: false })
     } catch (err: any) {
       set({ error: err.message, isLoading: false })
+    }
+  },
+  
+  createTenant: async (data) => {
+    set({ isLoading: true, error: null })
+    try {
+      await apiClient.post<Tenant>("/api/tenants", data)
+      // Refresh tenants list after creation
+      const { user } = (await import("@/store/auth/authStore")).useAuthStore.getState()
+      if (user) await get().fetchTenants(user.id)
+      set({ isLoading: false })
+    } catch (err: any) {
+      set({ error: err.message, isLoading: false })
+      throw err
+    }
+  },
+
+  createWorkspace: async (data) => {
+    set({ isLoading: true, error: null })
+    try {
+      await apiClient.post<Workspace>("/api/workspaces", data)
+      // Refresh workspaces list
+      if (get().activeTenant) await get().fetchWorkspaces(get().activeTenant!.id)
+      set({ isLoading: false })
+    } catch (err: any) {
+      set({ error: err.message, isLoading: false })
+      throw err
+    }
+  },
+
+  createProject: async (data) => {
+    set({ isLoading: true, error: null })
+    try {
+      const { workspaceId, ...body } = data
+      await apiClient.post<Project>(`/api/workspaces/${workspaceId}/projects`, body)
+      // Refresh projects list
+      if (get().activeWorkspace) await get().fetchProjects(get().activeWorkspace!.id)
+      set({ isLoading: false })
+    } catch (err: any) {
+      set({ error: err.message, isLoading: false })
+      throw err
+    }
+  },
+
+  generateInvite: async (teamId, recipientUsername) => {
+    set({ isLoading: true, error: null })
+    try {
+      const response = await apiClient.post<{ code: string }>("/api/i/generate", { teamId, recipientUsername })
+      set({ isLoading: false })
+      return response.code
+    } catch (err: any) {
+      set({ error: err.message, isLoading: false })
+      throw err
+    }
+  },
+
+  joinTeam: async (inviteCode) => {
+    set({ isLoading: true, error: null })
+    try {
+      await apiClient.post("/api/i/join", { inviteCode })
+      // Refresh teams if an active project exists
+      if (get().activeProject) await get().fetchTeams(get().activeProject!.id)
+      set({ isLoading: false })
+    } catch (err: any) {
+      set({ error: err.message, isLoading: false })
+      throw err
     }
   },
 
@@ -153,11 +227,8 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   },
 
   setActiveWorkspace: (workspace) => {
-    const { activeTenant } = get()
     set({ activeWorkspace: workspace })
-    if (activeTenant) {
-      get().fetchProjects(activeTenant.slug, workspace.id)
-    }
+    get().fetchProjects(workspace.id)
   },
 
   setActiveProject: (project) => {
