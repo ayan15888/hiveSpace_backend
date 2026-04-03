@@ -1,15 +1,15 @@
 "use client"
 
 import { Sparkles, Zap } from "lucide-react"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
-import OrgMarquee from "@/components/OrgMarquee"
-import { ScrollReveal } from "@/components/ScrollReveal"
+import Navbar from "@/components/marketing/Navbar"
+import Footer from "@/components/marketing/Footer"
+import OrgMarquee from "@/components/marketing/OrgMarquee"
+import { ScrollReveal } from "@/components/marketing/ScrollReveal"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { colors } from "@/lib/constants/color"
-import { HOME_BOARD_COLUMNS, HOME_FEATURES, HOME_TAGS, HOME_TAG_STYLES } from "@/lib/constants/homeHelpers"
+import { colors } from "@/constants/color"
+import { HOME_BOARD_COLUMNS, HOME_FEATURES, HOME_TAGS, HOME_TAG_STYLES } from "@/constants/homeHelpers"
 import Link from "next/link"
 
 const StatusTags = () => {

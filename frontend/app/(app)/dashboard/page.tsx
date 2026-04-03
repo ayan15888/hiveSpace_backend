@@ -1,8 +1,8 @@
 "use client";
 
-import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardHeader } from "@/components/layout/Topbar";
 import { DashboardMetrics } from "@/components/dashboard-metrics";
-import { DashboardKanban } from "@/components/kanban-board";
+import { DashboardKanban } from "@/features/kanban/components/KanbanBoard";
 import { ActivityFeed } from "@/components/activity-feed";
 import { SprintStatus, TeamWorkload } from "@/components/dashboard-widgets";
 

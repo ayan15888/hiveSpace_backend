@@ -2,14 +2,14 @@
 
 import { Sparkles } from "lucide-react"
 import { useRouter } from "next/navigation"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
+import Navbar from "@/components/marketing/Navbar"
+import Footer from "@/components/marketing/Footer"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { colors } from "@/lib/constants/color"
-import { useAuthStore } from "@/lib/auth-store"
+import { colors } from "@/constants/color"
+import { useAuthStore } from "@/store"
 import Link from "next/link"
 import { useState } from "react"
 

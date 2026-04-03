@@ -1,7 +1,7 @@
 "use client"
 
 import { create } from "zustand"
-import { apiClient } from "./api-client"
+import { apiClient } from "@/lib/api"
 
 export type Tenant = {
   id: string
@@ -18,7 +18,7 @@ export type Workspace = {
   description?: string
   plan: string
   tenantId: string
-  color?: string // Added for UI consistency with sidebar
+  color?: string
 }
 
 export type Project = {
@@ -27,8 +27,8 @@ export type Project = {
   description?: string
   status: string
   workspaceId: string
-  active?: boolean // UI state
-  color?: string // Added for UI consistency
+  active?: boolean
+  color?: string
 }
 
 export type Team = {
@@ -41,7 +41,7 @@ export type Team = {
   updatedAt: string
 }
 
-interface DataState {
+interface WorkspaceState {
   tenants: Tenant[]
   workspaces: Workspace[]
   projects: Project[]
@@ -64,7 +64,7 @@ interface DataState {
   setActiveProject: (project: Project) => void
 }
 
-export const useDataStore = create<DataState>((set, get) => ({
+export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   tenants: [],
   workspaces: [],
   projects: [],
@@ -80,12 +80,11 @@ export const useDataStore = create<DataState>((set, get) => ({
   fetchTenants: async (userId) => {
     set({ isLoading: true, error: null })
     try {
-      const tenants = await apiClient.get<Tenant[]>(`/api/tenants/user/${userId}`)
-      set({ tenants, isLoading: false })
+      const response = await apiClient.get<Tenant[]>(`/api/tenants/user/${userId}`)
+      set({ tenants: response, isLoading: false })
       
-      // Auto-select first tenant if none active
-      if (tenants.length > 0 && !get().activeTenant) {
-        get().setActiveTenant(tenants[0])
+      if (response.length > 0 && !get().activeTenant) {
+        get().setActiveTenant(response[0])
       }
     } catch (err: any) {
       set({ error: err.message, isLoading: false })
@@ -95,18 +94,16 @@ export const useDataStore = create<DataState>((set, get) => ({
   fetchWorkspaces: async (tenantId) => {
     set({ isLoading: true, error: null })
     try {
-      const workspaces = await apiClient.get<Workspace[]>(`/api/workspaces/tenant/${tenantId}`)
+      const response = await apiClient.get<Workspace[]>(`/api/workspaces/tenant/${tenantId}`)
       
-      // Assign random colors for UI if not present
       const colors = ["#534AB7", "#1D9E75", "#D85A30", "#378ADD", "#EF9F27"]
-      const enhancedWorkspaces = workspaces.map((ws, i) => ({
+      const enhancedWorkspaces = response.map((ws, i) => ({
         ...ws,
         color: colors[i % colors.length]
       }))
 
       set({ workspaces: enhancedWorkspaces, isLoading: false })
       
-      // Auto-select first workspace
       if (enhancedWorkspaces.length > 0) {
         get().setActiveWorkspace(enhancedWorkspaces[0])
       } else {
@@ -120,17 +117,16 @@ export const useDataStore = create<DataState>((set, get) => ({
   fetchProjects: async (tenantSlug, workspaceId) => {
     set({ isLoading: true, error: null })
     try {
-      const projects = await apiClient.get<Project[]>(`/api/${tenantSlug}/workspaces/${workspaceId}/projects`)
+      const response = await apiClient.get<Project[]>(`/api/${tenantSlug}/workspaces/${workspaceId}/projects`)
       
       const colors = ["#378ADD", "#EF9F27", "#D4537E", "#1D9E75"]
-      const enhancedProjects = projects.map((p, i) => ({
+      const enhancedProjects = response.map((p, i) => ({
         ...p,
         color: colors[i % colors.length]
       }))
 
       set({ projects: enhancedProjects, isLoading: false })
 
-      // Auto-select first project
       if (enhancedProjects.length > 0) {
         get().setActiveProject(enhancedProjects[0])
       } else {
@@ -144,8 +140,8 @@ export const useDataStore = create<DataState>((set, get) => ({
   fetchTeams: async (projectId) => {
     set({ isLoading: true, error: null })
     try {
-      const teams = await apiClient.get<Team[]>(`/api/p/${projectId}/teams`)
-      set({ teams, isLoading: false })
+      const response = await apiClient.get<Team[]>(`/api/p/${projectId}/teams`)
+      set({ teams: response, isLoading: false })
     } catch (err: any) {
       set({ error: err.message, isLoading: false })
     }

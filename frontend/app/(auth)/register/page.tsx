@@ -3,8 +3,8 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Sparkles } from "lucide-react"
-import Navbar from "@/components/Navbar"
-import Footer from "@/components/Footer"
+import Navbar from "@/components/marketing/Navbar"
+import Footer from "@/components/marketing/Footer"
 import { Label } from "@/components/ui/label"
 import {
   Card,
@@ -15,8 +15,8 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { colors } from "@/lib/constants/color"
-import { useAuthStore } from "@/lib/auth-store"
+import { colors } from "@/constants/color"
+import { useAuthStore } from "@/store"
 import Link from "next/link"
 
 const RegisterPage = () => {

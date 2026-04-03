@@ -1,8 +1,10 @@
 "use client";
 
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { MOCK_SPRINT } from "@/lib/mock-data";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useWorkspaceStore } from "@/store";
+import { cn } from "@/lib/utils";
 
 export function SprintStatus() {
   return (
@@ -44,12 +46,8 @@ export function SprintStatus() {
   );
 }
 
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useDataStore } from "@/lib/data-store";
-import { cn } from "@/lib/utils";
-
 export function TeamWorkload() {
-  const teams = useDataStore((state) => state.teams);
+  const teams = useWorkspaceStore((state) => state.teams);
 
   return (
     <Card className="flex h-full flex-col border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950 overflow-hidden group">

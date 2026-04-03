@@ -18,8 +18,17 @@
         "name": "next"
       }
     ],
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"]
+      "@/*":            ["./*"],
+      "@/features/*":   ["./features/*"],
+      "@/store":        ["./store/index.ts"],
+      "@/store/*":      ["./store/*"],
+      "@/components/*": ["./components/*"],
+      "@/lib/*":        ["./lib/*"],
+      "@/providers/*":  ["./providers/*"],
+      "@/constants/*":  ["./constants/*"],
+      "@/hooks/*":      ["./hooks/*"]
     }
   },
   "include": [

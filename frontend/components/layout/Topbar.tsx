@@ -3,10 +3,10 @@
 import { Bell, Search, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useDataStore } from "@/lib/data-store";
+import { useWorkspaceStore } from "@/store/workspace/workspaceStore";
 
 export function DashboardHeader() {
-  const activeWorkspace = useDataStore((state) => state.activeWorkspace);
+  const activeWorkspace = useWorkspaceStore((state) => state.activeWorkspace);
 
   return (
     <header className="flex h-16 w-full items-center justify-between border-b border-zinc-200 bg-white px-6 dark:border-zinc-800 dark:bg-zinc-950">

@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { Sparkles } from "lucide-react"
-import { Button } from "./ui/button"
+import { Button } from "@/components/ui/button"
 
 type NavItem = {
   path: string
@@ -13,7 +13,7 @@ type NavbarProps = {
   items: NavItem[]
 }
 
-import { useAuthStore } from "@/lib/auth-store"
+import { useAuthStore } from "@/store"
 
 const Navbar = ({ items }: NavbarProps) => {
   const { isAuthenticated, logout } = useAuthStore()

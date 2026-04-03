@@ -1,7 +1,7 @@
 "use client"
 
 import { create } from "zustand"
-import { apiClient } from "./api-client"
+import { apiClient } from "@/lib/api"
 
 export type User = {
   id: string

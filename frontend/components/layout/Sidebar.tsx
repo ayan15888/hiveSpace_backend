@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   CheckSquare,
@@ -31,16 +32,18 @@ import {
   SidebarGroupContent,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { useAuthStore } from "@/lib/auth-store";
-import { useDataStore } from "@/lib/data-store";
+import { useAuthStore } from "@/store/auth/authStore";
+import { useWorkspaceStore } from "@/store/workspace/workspaceStore";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MOCK_CHANNELS } from "@/lib/mock-data";
+import { gooeyToast } from "@/components/ui/goey-toaster";
 
 export function AppSidebar() {
+  const router = useRouter();
   const { state } = useSidebar();
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const { 
     tenants, 
     workspaces, 
@@ -51,7 +54,7 @@ export function AppSidebar() {
     setActiveTenant,
     setActiveWorkspace,
     setActiveProject
-  } = useDataStore();
+  } = useWorkspaceStore();
 
   const mainNav = [
     { name: "Overview", icon: LayoutDashboard, active: true },
@@ -61,6 +64,12 @@ export function AppSidebar() {
 
   const getInitials = (name: string) => {
     return name.split(" ").map(n => n[0]).join("").toUpperCase();
+  };
+  
+  const handleLogout = () => {
+    logout();
+    gooeyToast.success("Logged out successfully");
+    router.push("/");
   };
 
   return (
@@ -173,6 +182,21 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+      
+      <div className="mt-auto border-t border-zinc-100 dark:border-zinc-800">
+        <SidebarMenu className="p-2">
+          <SidebarMenuItem>
+            <SidebarMenuButton 
+              onClick={handleLogout}
+              className="text-zinc-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+              tooltip="Logout"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="text-sm group-data-[collapsible=icon]:hidden">Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </div>
 
       <SidebarFooter className="p-4">
         {user && (

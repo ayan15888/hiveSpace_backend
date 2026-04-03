@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Figtree } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
-import { AuthProvider } from "@/components/providers/AuthProvider";
+import { AuthProvider } from "@/providers/AuthProvider";
+import { GooeyToaster } from "@/components/ui/goey-toaster";
 
 const figtreeHeading = Figtree({subsets:['latin'],variable:'--font-heading'});
 
@@ -37,6 +38,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <AuthProvider>
           {children}
+          <GooeyToaster />
         </AuthProvider>
       </body>
     </html>
