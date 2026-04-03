@@ -39,6 +39,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { MOCK_CHANNELS } from "@/lib/mock-data";
 import { gooeyToast } from "@/components/ui/goey-toaster";
+import { CreateWorkspaceModal } from "@/features/dashboard/components/CreateWorkspaceModal";
+import { CreateProjectModal } from "@/features/dashboard/components/CreateProjectModal";
+import { CreateTeamModal } from "@/features/dashboard/components/CreateTeamModal";
 
 export function AppSidebar() {
   const router = useRouter();
@@ -61,6 +64,10 @@ export function AppSidebar() {
     { name: "My tasks", icon: CheckSquare, badge: 5 },
     { name: "Inbox", icon: Inbox, badge: 3 },
   ];
+
+  const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = React.useState(false);
+  const [isProjectModalOpen, setIsProjectModalOpen] = React.useState(false);
+  const [isTeamModalOpen, setIsTeamModalOpen] = React.useState(false);
 
   const getInitials = (name: string) => {
     return name.split(" ").map(n => n[0]).join("").toUpperCase();
@@ -112,7 +119,15 @@ export function AppSidebar() {
         <Separator className="mx-4 my-2 w-auto group-data-[collapsible=icon]:hidden" />
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Workspaces</SidebarGroupLabel>
+          <div className="flex items-center justify-between pr-2">
+            <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Workspaces</SidebarGroupLabel>
+            <button 
+              onClick={() => setIsWorkspaceModalOpen(true)}
+              className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-zinc-500 hover:text-zinc-900 group-data-[collapsible=icon]:hidden"
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+          </div>
           <SidebarGroupContent>
             <SidebarMenu>
               {workspaces.map((ws) => (
@@ -140,7 +155,15 @@ export function AppSidebar() {
         <Separator className="mx-4 my-2 w-auto group-data-[collapsible=icon]:hidden" />
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Projects</SidebarGroupLabel>
+          <div className="flex items-center justify-between pr-2">
+            <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Projects</SidebarGroupLabel>
+            <button 
+              onClick={() => setIsProjectModalOpen(true)}
+              className="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-zinc-500 hover:text-zinc-900 group-data-[collapsible=icon]:hidden"
+            >
+              <Plus className="h-3 w-3" />
+            </button>
+          </div>
           <SidebarGroupContent>
             <SidebarMenu>
               {projects.map((project) => (
@@ -154,6 +177,18 @@ export function AppSidebar() {
                     <span className={activeProject?.id === project.id ? "font-medium text-sm group-data-[collapsible=icon]:hidden text-zinc-900 dark:text-zinc-100" : "text-sm group-data-[collapsible=icon]:hidden text-zinc-700 dark:text-zinc-300"}>
                       {project.name}
                     </span>
+                    {activeProject?.id === project.id && (
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsTeamModalOpen(true);
+                        }}
+                        className="ml-auto p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-500 hover:text-zinc-900 group-data-[collapsible=icon]:hidden"
+                        title="Add team to project"
+                      >
+                        <Plus className="h-3 w-3" />
+                      </button>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -214,6 +249,19 @@ export function AppSidebar() {
           </div>
         )}
       </SidebarFooter>
+
+      <CreateWorkspaceModal 
+        isOpen={isWorkspaceModalOpen} 
+        onClose={() => setIsWorkspaceModalOpen(false)} 
+      />
+      <CreateProjectModal 
+        isOpen={isProjectModalOpen} 
+        onClose={() => setIsProjectModalOpen(false)} 
+      />
+      <CreateTeamModal 
+        isOpen={isTeamModalOpen} 
+        onClose={() => setIsTeamModalOpen(false)} 
+      />
     </Sidebar>
   );
 }

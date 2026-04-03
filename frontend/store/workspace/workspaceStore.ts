@@ -63,6 +63,7 @@ interface WorkspaceState {
   createTenant: (data: { name: string, slug: string, plan?: string, description?: string }) => Promise<void>
   createWorkspace: (data: { name: string, description?: string, plan: string, tenantId: string }) => Promise<void>
   createProject: (data: { name: string, description?: string, status: string, workspaceId: string }) => Promise<void>
+  createTeam: (data: { name: string, description?: string, projectId: string }) => Promise<void>
   
   generateInvite: (teamId: string, recipientUsername: string) => Promise<string>
   joinTeam: (inviteCode: string) => Promise<void>
@@ -192,10 +193,23 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   createProject: async (data) => {
     set({ isLoading: true, error: null })
     try {
-      const { workspaceId, ...body } = data
-      await apiClient.post<Project>(`/api/workspaces/${workspaceId}/projects`, body)
+      await apiClient.post<Project>(`/api/workspaces/${data.workspaceId}/projects`, data)
       // Refresh projects list
       if (get().activeWorkspace) await get().fetchProjects(get().activeWorkspace!.id)
+      set({ isLoading: false })
+    } catch (err: any) {
+      set({ error: err.message, isLoading: false })
+      throw err
+    }
+  },
+
+  createTeam: async (data) => {
+    set({ isLoading: true, error: null })
+    try {
+      const { projectId, ...body } = data
+      await apiClient.post<Team>(`/api/p/${projectId}/teams`, body)
+      // Refresh teams list
+      if (get().activeProject) await get().fetchTeams(get().activeProject!.id)
       set({ isLoading: false })
     } catch (err: any) {
       set({ error: err.message, isLoading: false })

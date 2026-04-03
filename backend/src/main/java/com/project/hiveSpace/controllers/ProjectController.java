@@ -22,6 +22,7 @@ public class ProjectController {
     public ResponseEntity<ProjectResponse> createProject(
             @PathVariable UUID workspaceId,
             @Valid @RequestBody ProjectRequest request) {
+        request.setWorkspaceId(workspaceId);
         return ResponseEntity.ok(projectService.createProject(workspaceId, request));
     }
 
