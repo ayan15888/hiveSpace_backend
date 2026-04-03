@@ -23,7 +23,7 @@ const LoginPage = () => {
     e.preventDefault()
     try {
       await login({ email, password })
-      router.push("/dashboard")
+      router.push("/onboarding")
     } catch (err) {
       // Error is handled by the store
       console.error("Login failed:", err)

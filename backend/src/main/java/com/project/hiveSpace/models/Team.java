@@ -27,8 +27,9 @@ public class Team {
     @Column(name = "description", nullable = true)
     private String description;
 
+    @Builder.Default
     @Column(name = "members_count", nullable = false)
-    private int membersCount;
+    private int membersCount = 0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_id", nullable = false)

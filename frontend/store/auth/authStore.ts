@@ -8,6 +8,7 @@ export type User = {
   email: string
   username: string
   role: string
+  hasTenants: boolean
 }
 
 type AuthResponse = {
@@ -16,6 +17,7 @@ type AuthResponse = {
   email: string
   username: string
   role: string
+  hasTenants: boolean
 }
 
 interface AuthState {
@@ -100,7 +102,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ isLoading: true })
     try {
       const user = await apiClient.get<User>("/api/profile")
-      set({ user, isLoading: false })
+      set({ user, isLoading: false, isAuthenticated: true })
     } catch (err: any) {
       // If profile fetch fails (e.g. invalid token), logout
       localStorage.removeItem("hs-token")

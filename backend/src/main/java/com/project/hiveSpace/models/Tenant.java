@@ -41,9 +41,11 @@ public class Tenant {
     @Column(length = 500)
     private String description;
 
+    @Builder.Default
     @Column(name = "members_count", nullable = false)
-    private int membersCount;
+    private int membersCount = 0;
 
+    @Builder.Default
     @Column(name = "workspaces_count", nullable = false)
-    private int workspacesCount;
+    private int workspacesCount = 0;
 }

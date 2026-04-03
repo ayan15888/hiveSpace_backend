@@ -26,13 +26,28 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
 
+  const [localError, setLocalError] = useState<string | null>(null)
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLocalError(null)
+
+    if (username.length < 3) {
+      setLocalError("Username must be at least 3 characters")
+      return
+    }
+
+    if (password.length < 6) {
+      setLocalError("Password must be at least 6 characters")
+      return
+    }
+
     try {
       await register({ username, email, password })
-      router.push("/dashboard")
-    } catch (err) {
+      router.push("/onboarding")
+    } catch (err: any) {
       console.error("Registration failed:", err)
+      setLocalError(err.message || "Registration failed. Please try again.")
     }
   }
 
@@ -124,8 +139,10 @@ const RegisterPage = () => {
                   </div>
 
                   {/* ERROR */}
-                  {apiError && (
-                    <p className="text-sm text-red-600">{apiError}</p>
+                  {(localError || apiError) && (
+                    <p className="text-sm text-red-600 bg-red-50 p-2 rounded-md border border-red-100">
+                      {localError || apiError}
+                    </p>
                   )}
 
                   {/* SUBMIT */}

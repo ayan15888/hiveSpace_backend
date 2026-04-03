@@ -37,8 +37,9 @@ public class Workspace {
     @Column(name = "created_at", nullable = false)
     private Date createdAt;
 
+    @Builder.Default
     @Column(name = "members_count", nullable = false)
-    private int membersCount;
+    private int membersCount = 0;
 
     @Column(name = "updated_at", nullable = false)
     private Date updatedAt;
