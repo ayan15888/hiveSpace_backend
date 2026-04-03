@@ -31,19 +31,27 @@ import {
   SidebarGroupContent,
   useSidebar,
 } from "@/components/ui/sidebar";
-import {
-  MOCK_ORG,
-  MOCK_USER,
-  MOCK_WORKSPACES,
-  MOCK_PROJECTS,
-  MOCK_CHANNELS,
-} from "@/lib/mock-data";
+import { useAuthStore } from "@/lib/auth-store";
+import { useDataStore } from "@/lib/data-store";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { MOCK_CHANNELS } from "@/lib/mock-data";
 
 export function AppSidebar() {
   const { state } = useSidebar();
+  const { user } = useAuthStore();
+  const { 
+    tenants, 
+    workspaces, 
+    projects, 
+    activeTenant, 
+    activeWorkspace,
+    activeProject,
+    setActiveTenant,
+    setActiveWorkspace,
+    setActiveProject
+  } = useDataStore();
 
   const mainNav = [
     { name: "Overview", icon: LayoutDashboard, active: true },
@@ -51,16 +59,22 @@ export function AppSidebar() {
     { name: "Inbox", icon: Inbox, badge: 3 },
   ];
 
+  const getInitials = (name: string) => {
+    return name.split(" ").map(n => n[0]).join("").toUpperCase();
+  };
+
   return (
     <Sidebar className="border-r border-zinc-200 dark:border-zinc-800" variant="sidebar" collapsible="icon">
       <SidebarHeader className="p-4">
-        <div className="flex items-center gap-3 px-1 py-1.5 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
-          <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#534AB7] text-white text-[11px] font-bold">
-            {MOCK_ORG.avatar}
+        {activeTenant && (
+          <div className="flex items-center gap-3 px-1 py-1.5 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#534AB7] text-white text-[11px] font-bold">
+              {activeTenant.name.substring(0, 2).toUpperCase()}
+            </div>
+            <span className="flex-1 font-semibold text-sm truncate group-data-[collapsible=icon]:hidden">{activeTenant.name}</span>
+            <ChevronRight className="h-4 w-4 text-zinc-400 rotate-90 group-data-[collapsible=icon]:hidden" />
           </div>
-          <span className="flex-1 font-semibold text-sm truncate group-data-[collapsible=icon]:hidden">{MOCK_ORG.name}</span>
-          <ChevronRight className="h-4 w-4 text-zinc-400 rotate-90 group-data-[collapsible=icon]:hidden" />
-        </div>
+        )}
       </SidebarHeader>
 
       <SidebarContent>
@@ -92,9 +106,13 @@ export function AppSidebar() {
           <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Workspaces</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {MOCK_WORKSPACES.map((ws) => (
+              {workspaces.map((ws) => (
                 <SidebarMenuItem key={ws.id}>
-                  <SidebarMenuButton tooltip={ws.name}>
+                  <SidebarMenuButton 
+                    tooltip={ws.name}
+                    isActive={activeWorkspace?.id === ws.id}
+                    onClick={() => setActiveWorkspace(ws)}
+                  >
                     <div className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: ws.color }} />
                     <span className="text-sm group-data-[collapsible=icon]:hidden">{ws.name}</span>
                   </SidebarMenuButton>
@@ -116,11 +134,17 @@ export function AppSidebar() {
           <SidebarGroupLabel className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">Projects</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {MOCK_PROJECTS.map((project) => (
+              {projects.map((project) => (
                 <SidebarMenuItem key={project.id}>
-                  <SidebarMenuButton isActive={project.active} tooltip={project.name}>
+                  <SidebarMenuButton 
+                    tooltip={project.name}
+                    isActive={activeProject?.id === project.id}
+                    onClick={() => setActiveProject(project)}
+                  >
                     <div className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: project.color }} />
-                    <span className={project.active ? "font-medium text-sm group-data-[collapsible=icon]:hidden" : "text-sm group-data-[collapsible=icon]:hidden"}>{project.name}</span>
+                    <span className={activeProject?.id === project.id ? "font-medium text-sm group-data-[collapsible=icon]:hidden text-zinc-900 dark:text-zinc-100" : "text-sm group-data-[collapsible=icon]:hidden text-zinc-700 dark:text-zinc-300"}>
+                      {project.name}
+                    </span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -151,19 +175,20 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter className="p-4">
-        <div className="flex items-center gap-3 p-1 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors overflow-hidden">
-          <Avatar className="h-8 w-8 shrink-0 rounded-full">
-            <AvatarImage src={MOCK_USER.avatar} />
-            <AvatarFallback className="bg-blue-100 text-blue-600 font-medium text-[11px]">
-              {MOCK_USER.initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
-            <span className="font-medium text-xs truncate">{MOCK_USER.name}</span>
-            <span className="text-[10px] text-zinc-500 truncate">{MOCK_USER.role}</span>
+        {user && (
+          <div className="flex items-center gap-3 p-1 cursor-pointer hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors overflow-hidden">
+            <Avatar className="h-8 w-8 shrink-0 rounded-full">
+              <AvatarFallback className="bg-blue-100 text-blue-600 font-medium text-[11px]">
+                {getInitials(user.username)}
+              </AvatarFallback>
+            </Avatar>
+            <div className="flex-1 flex flex-col min-w-0 group-data-[collapsible=icon]:hidden">
+              <span className="font-medium text-xs truncate">{user.username}</span>
+              <span className="text-[10px] text-zinc-500 truncate">{user.role}</span>
+            </div>
+            <div className="h-2 w-2 shrink-0 rounded-full bg-green-500 ring-2 ring-white dark:ring-zinc-900 group-data-[collapsible=icon]:hidden" />
           </div>
-          <div className="h-2 w-2 shrink-0 rounded-full bg-green-500 ring-2 ring-white dark:ring-zinc-900 group-data-[collapsible=icon]:hidden" />
-        </div>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

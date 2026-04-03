@@ -13,7 +13,11 @@ type NavbarProps = {
   items: NavItem[]
 }
 
+import { useAuthStore } from "@/lib/auth-store"
+
 const Navbar = ({ items }: NavbarProps) => {
+  const { isAuthenticated, logout } = useAuthStore()
+
   return (
     <header className="sticky top-0 z-40 border-b border-dashed border-slate-200 bg-white/80 backdrop-blur">
       <div className="mx-auto flex max-w-6xl xl:max-w-7xl 2xl:max-w-[1440px] items-center justify-between px-6 py-3 sm:px-10">
@@ -44,21 +48,44 @@ const Navbar = ({ items }: NavbarProps) => {
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              asChild
-              size="sm"
-              variant="outline"
-              className="hidden rounded-full border-dashed border-slate-300 bg-white px-4 font-medium text-slate-900 hover:bg-slate-50 sm:inline-flex h-9"
-            >
-              <Link href="/login">Login</Link>
-            </Button>
-            <Button
-              asChild
-              size="sm"
-              className="rounded-full bg-black px-4 font-medium text-white hover:bg-black h-9"
-            >
-              <Link href="/register">Register</Link>
-            </Button>
+            {isAuthenticated ? (
+              <>
+                <Button
+                  asChild
+                  size="sm"
+                  variant="outline"
+                  className="rounded-full border-dashed border-slate-300 bg-white px-4 font-medium text-slate-900 hover:bg-slate-50 h-9"
+                >
+                  <Link href="/dashboard">Dashboard</Link>
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  className="rounded-full px-4 font-medium text-slate-600 hover:text-red-500 h-9"
+                  onClick={() => logout()}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  asChild
+                  size="sm"
+                  variant="outline"
+                  className="hidden rounded-full border-dashed border-slate-300 bg-white px-4 font-medium text-slate-900 hover:bg-slate-50 sm:inline-flex h-9"
+                >
+                  <Link href="/login">Login</Link>
+                </Button>
+                <Button
+                  asChild
+                  size="sm"
+                  className="rounded-full bg-black px-4 font-medium text-white hover:bg-black h-9"
+                >
+                  <Link href="/register">Register</Link>
+                </Button>
+              </>
+            )}
           </div>
         </nav>
       </div>

@@ -9,17 +9,25 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { colors } from "@/lib/constants/color"
-import { useAuth } from "@/lib/auth-mock"
+import { useAuthStore } from "@/lib/auth-store"
 import Link from "next/link"
+import { useState } from "react"
 
 const LoginPage = () => {
   const router = useRouter()
-  const { login } = useAuth()
+  const { login, isLoading, error } = useAuthStore()
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    login()
-    router.push("/dashboard")
+    try {
+      await login({ email, password })
+      router.push("/dashboard")
+    } catch (err) {
+      // Error is handled by the store
+      console.error("Login failed:", err)
+    }
   }
 
   return (
@@ -71,6 +79,8 @@ const LoginPage = () => {
                       placeholder="you@team.com"
                       className="border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 h-10"
                       required
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
                     />
                   </div>
 
@@ -83,6 +93,8 @@ const LoginPage = () => {
                       type="password"
                       className="border-slate-200 bg-white text-slate-900 placeholder:text-slate-400 h-10"
                       required
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
                     />
                   </div>
 
@@ -99,8 +111,14 @@ const LoginPage = () => {
                     </button>
                   </div>
 
-                  <Button type="submit" className="mt-2 w-full rounded-full bg-slate-900 text-white hover:bg-black h-11">
-                    Log in
+                  {error && <p className="text-xs text-red-500 text-center">{error}</p>}
+
+                  <Button 
+                    type="submit" 
+                    className="mt-2 w-full rounded-full bg-slate-900 text-white hover:bg-black h-11"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? "Logging in..." : "Log in"}
                   </Button>
 
                   <p className="pt-2 text-center text-xs text-slate-500">

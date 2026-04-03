@@ -16,30 +16,23 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { colors } from "@/lib/constants/color"
-import { useAuth, registerUser } from "@/lib/auth-mock"
+import { useAuthStore } from "@/lib/auth-store"
 import Link from "next/link"
 
 const RegisterPage = () => {
   const router = useRouter()
-  const { login } = useAuth()
+  const { register, isLoading, error: apiError } = useAuthStore()
   const [username, setUsername] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setLoading(true)
-    setError(null)
     try {
-      await registerUser({ username, email, password })
-      login()
+      await register({ username, email, password })
       router.push("/dashboard")
-    } catch (err: unknown) {
-      setError("Registration failed. Try again.")
-    } finally {
-      setLoading(false)
+    } catch (err) {
+      console.error("Registration failed:", err)
     }
   }
 
@@ -131,17 +124,17 @@ const RegisterPage = () => {
                   </div>
 
                   {/* ERROR */}
-                  {error && (
-                    <p className="text-sm text-red-600">{error}</p>
+                  {apiError && (
+                    <p className="text-sm text-red-600">{apiError}</p>
                   )}
 
                   {/* SUBMIT */}
                   <Button
                     type="submit"
-                    disabled={loading}
+                    disabled={isLoading}
                     className="mt-2 w-full rounded-full bg-black text-white hover:bg-black h-11"
                   >
-                    {loading ? "Creating account..." : "Register"}
+                    {isLoading ? "Creating account..." : "Register"}
                   </Button>
 
                   <p className="pt-2 text-center text-xs text-slate-500">
