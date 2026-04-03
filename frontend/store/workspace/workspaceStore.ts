@@ -51,6 +51,7 @@ interface WorkspaceState {
   activeTenant: Tenant | null
   activeWorkspace: Workspace | null
   activeProject: Project | null
+  activeTeam: Team | null
   
   isLoading: boolean
   error: string | null
@@ -71,6 +72,7 @@ interface WorkspaceState {
   setActiveTenant: (tenant: Tenant) => void
   setActiveWorkspace: (workspace: Workspace) => void
   setActiveProject: (project: Project) => void
+  setActiveTeam: (team: Team | null) => void
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
@@ -82,6 +84,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   activeTenant: null,
   activeWorkspace: null,
   activeProject: null,
+  activeTeam: null,
   
   isLoading: false,
   error: null,
@@ -254,7 +257,11 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   },
 
   setActiveProject: (project) => {
-    set({ activeProject: project })
+    set({ activeProject: project, activeTeam: null })
     get().fetchTeams(project.id)
+  },
+
+  setActiveTeam: (team) => {
+    set({ activeTeam: team })
   }
 }))

@@ -14,6 +14,7 @@ import {
   User as UserIcon,
   Bell,
   Search,
+  Users,
 } from "lucide-react";
 
 import {
@@ -27,6 +28,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  SidebarMenuAction,
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
@@ -51,12 +53,15 @@ export function AppSidebar() {
     tenants, 
     workspaces, 
     projects, 
+    teams,
     activeTenant, 
     activeWorkspace,
     activeProject,
+    activeTeam,
     setActiveTenant,
     setActiveWorkspace,
-    setActiveProject
+    setActiveProject,
+    setActiveTeam
   } = useWorkspaceStore();
 
   const mainNav = [
@@ -177,19 +182,34 @@ export function AppSidebar() {
                     <span className={activeProject?.id === project.id ? "font-medium text-sm group-data-[collapsible=icon]:hidden text-zinc-900 dark:text-zinc-100" : "text-sm group-data-[collapsible=icon]:hidden text-zinc-700 dark:text-zinc-300"}>
                       {project.name}
                     </span>
-                    {activeProject?.id === project.id && (
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setIsTeamModalOpen(true);
-                        }}
-                        className="ml-auto p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-500 hover:text-zinc-900 group-data-[collapsible=icon]:hidden"
-                        title="Add team to project"
-                      >
-                        <Plus className="h-3 w-3" />
-                      </button>
-                    )}
                   </SidebarMenuButton>
+                  {activeProject?.id === project.id && (
+                    <SidebarMenuAction
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsTeamModalOpen(true);
+                      }}
+                      className="hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-500 hover:text-zinc-900"
+                      title="Add team to project"
+                    >
+                      <Plus className="h-3 w-3" />
+                    </SidebarMenuAction>
+                  )}
+                  {activeProject?.id === project.id && teams.length > 0 && (
+                    <SidebarMenuSub>
+                      {teams.map((team) => (
+                        <SidebarMenuSubItem key={team.id}>
+                          <SidebarMenuSubButton
+                            isActive={activeTeam?.id === team.id}
+                            onClick={() => setActiveTeam(team)}
+                          >
+                            <Users className="h-4 w-4" />
+                            <span>{team.name}</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  )}
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
