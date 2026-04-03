@@ -44,7 +44,8 @@ const RegisterPage = () => {
 
     try {
       await register({ username, email, password })
-      router.push("/onboarding")
+      // Always push to dashboard; the dashboard/layout will redirect to onboarding if needed
+      router.push("/dashboard")
     } catch (err: any) {
       console.error("Registration failed:", err)
       setLocalError(err.message || "Registration failed. Please try again.")

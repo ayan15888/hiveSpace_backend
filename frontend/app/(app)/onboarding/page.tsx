@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuthStore } from "@/store"
-import { useWorkspaceStore } from "@/store"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { PlusCircle, Users, ArrowRight, Sparkles, Building2 } from "lucide-react"
@@ -14,16 +13,26 @@ import Footer from "@/components/marketing/Footer"
 export default function OnboardingPage() {
   const router = useRouter()
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStore()
+  const [mounted, setMounted] = useState(false)
   const [redirecting, setRedirecting] = useState(false)
 
   useEffect(() => {
-    if (!authLoading && isAuthenticated && user?.hasTenants) {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && !authLoading && isAuthenticated && user?.hasTenants) {
       setRedirecting(true)
       router.push("/dashboard")
     }
-  }, [user, isAuthenticated, authLoading, router])
+  }, [user, isAuthenticated, authLoading, router, mounted])
 
-  if (authLoading || redirecting) {
+  // Show loader if:
+  // 1. Not mounted yet (SSR phase)
+  // 2. Auth is still loading
+  // 3. We are in the process of redirecting
+  // 4. User is authenticated but we haven't confirmed they lack tenants yet (or we know they HAVE tenants and are about to redirect)
+  if (!mounted || authLoading || redirecting || (isAuthenticated && (user === null || user.hasTenants))) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center space-y-4">

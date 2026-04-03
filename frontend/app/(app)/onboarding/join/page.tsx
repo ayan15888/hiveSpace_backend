@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import { useWorkspaceStore } from "@/store"
+import { useAuthStore, useWorkspaceStore } from "@/store"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,9 +14,29 @@ import Footer from "@/components/marketing/Footer"
 
 export default function JoinOrganizationPage() {
   const router = useRouter()
+  const { user, isAuthenticated, isLoading: authLoading } = useAuthStore()
   const { joinTeam, isLoading, error: apiError } = useWorkspaceStore()
-  
+  const [mounted, setMounted] = useState(false)
   const [inviteCode, setInviteCode] = useState("")
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (mounted && !authLoading && isAuthenticated && user?.hasTenants) {
+      router.push("/dashboard")
+    }
+  }, [user, isAuthenticated, authLoading, router, mounted])
+
+  // Stay on loading state until we confirm redirect is unnecessary
+  if (!mounted || authLoading || (isAuthenticated && (user === null || user.hasTenants))) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-white">
+        <div className="h-12 w-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

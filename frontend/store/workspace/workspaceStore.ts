@@ -2,6 +2,7 @@
 
 import { create } from "zustand"
 import { apiClient } from "@/lib/api"
+import { useAuthStore } from "@/store/auth/authStore"
 
 export type Tenant = {
   id: string
@@ -90,8 +91,11 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       const response = await apiClient.get<Tenant[]>(`/api/tenants/u/${userId}`)
       set({ tenants: response, isLoading: false })
       
-      if (response.length > 0 && !get().activeTenant) {
-        get().setActiveTenant(response[0])
+      if (response.length > 0) {
+        useAuthStore.getState().setHasTenants(true)
+        if (!get().activeTenant) {
+          get().setActiveTenant(response[0])
+        }
       }
     } catch (err: any) {
       set({ error: err.message, isLoading: false })
@@ -160,8 +164,11 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     try {
       await apiClient.post<Tenant>("/api/tenants", data)
       // Refresh tenants list after creation
-      const { user } = (await import("@/store/auth/authStore")).useAuthStore.getState()
-      if (user) await get().fetchTenants(user.id)
+      const { user, setHasTenants } = useAuthStore.getState()
+      if (user) {
+        setHasTenants(true)
+        await get().fetchTenants(user.id)
+      }
       set({ isLoading: false })
     } catch (err: any) {
       set({ error: err.message, isLoading: false })
@@ -212,6 +219,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       await apiClient.post("/api/i/join", { inviteCode })
+      useAuthStore.getState().setHasTenants(true)
       // Refresh teams if an active project exists
       if (get().activeProject) await get().fetchTeams(get().activeProject!.id)
       set({ isLoading: false })

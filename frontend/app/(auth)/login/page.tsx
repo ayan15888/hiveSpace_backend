@@ -23,7 +23,8 @@ const LoginPage = () => {
     e.preventDefault()
     try {
       await login({ email, password })
-      router.push("/onboarding")
+      // Always push to dashboard; the dashboard/layout will redirect to onboarding if needed
+      router.push("/dashboard")
     } catch (err) {
       // Error is handled by the store
       console.error("Login failed:", err)

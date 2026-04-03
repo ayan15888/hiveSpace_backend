@@ -32,6 +32,7 @@ interface AuthState {
   logout: () => void
   fetchProfile: () => Promise<void>
   initialize: () => void
+  setHasTenants: (hasTenants: boolean) => void
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
@@ -44,6 +45,8 @@ export const useAuthStore = create<AuthState>((set) => ({
   initialize: () => {
     const token = localStorage.getItem("hs-token")
     if (token) {
+      // Sync to cookie for middleware support
+      document.cookie = `hs-token=${token}; path=/; max-age=86400; SameSite=Lax`
       set({ token, isAuthenticated: true })
       // Auto fetch profile if token exists
       useAuthStore.getState().fetchProfile()
@@ -57,6 +60,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { token, ...user } = response
       
       localStorage.setItem("hs-token", token)
+      document.cookie = `hs-token=${token}; path=/; max-age=86400; SameSite=Lax`
       set({ 
         user, 
         token, 
@@ -76,6 +80,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       const { token, ...user } = response
       
       localStorage.setItem("hs-token", token)
+      document.cookie = `hs-token=${token}; path=/; max-age=86400; SameSite=Lax`
       set({ 
         user, 
         token, 
@@ -90,6 +95,7 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   logout: () => {
     localStorage.removeItem("hs-token")
+    document.cookie = "hs-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
     set({ 
       user: null, 
       token: null, 
@@ -106,6 +112,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     } catch (err: any) {
       // If profile fetch fails (e.g. invalid token), logout
       localStorage.removeItem("hs-token")
+      document.cookie = "hs-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT"
       set({ 
         user: null, 
         token: null, 
@@ -113,5 +120,11 @@ export const useAuthStore = create<AuthState>((set) => ({
         isLoading: false 
       })
     }
+  },
+
+  setHasTenants: (hasTenants: boolean) => {
+    set((state) => ({
+      user: state.user ? { ...state.user, hasTenants } : null
+    }))
   }
 }))
