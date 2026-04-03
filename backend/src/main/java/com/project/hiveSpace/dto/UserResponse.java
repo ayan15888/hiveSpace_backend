@@ -13,4 +13,5 @@ public class UserResponse {
     private String username;
     private Role role;
     private String token; // The JWT token
+    private boolean hasTenants;
 }

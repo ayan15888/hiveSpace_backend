@@ -3,6 +3,8 @@ package com.project.hiveSpace.services;
 import com.project.hiveSpace.dto.UserResponse;
 import com.project.hiveSpace.models.Role;
 import com.project.hiveSpace.models.User;
+import com.project.hiveSpace.repository.EmployeeRepository;
+import com.project.hiveSpace.repository.TenantRepository;
 import com.project.hiveSpace.repository.UserRepository;
 import com.project.hiveSpace.security.JwtService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,8 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final TenantRepository tenantRepository;
+    private final EmployeeRepository employeeRepository;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
@@ -66,12 +70,17 @@ public class UserService {
     }
 
     private UserResponse toResponse(User user, String token) {
+        boolean hasTenants = (user.getTenant() != null) || 
+                           (tenantRepository.countByOwnerEmail(user.getEmail()) > 0) || 
+                           (employeeRepository.existsByUser(user));
+
         return new UserResponse(
                 user.getId(),
                 user.getEmail(),
                 user.getUsername(),
                 user.getRole(),
-                token
+                token,
+                hasTenants
         );
     }
 }

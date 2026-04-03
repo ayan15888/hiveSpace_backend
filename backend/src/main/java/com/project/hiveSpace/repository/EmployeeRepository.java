@@ -15,4 +15,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, UUID> {
     List<Employee> findAllByTeamId(UUID teamId);
     boolean existsByUserAndTeam(User user, Team team);
     Optional<Employee> findByUserIdAndWorkspaceId(UUID userId, UUID workspaceId);
+    boolean existsByUser(User user);
 }
