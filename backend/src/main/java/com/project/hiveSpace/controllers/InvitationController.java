@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+import java.util.Collections;
+
 @RestController
 @RequestMapping("/api/i")
 @RequiredArgsConstructor
@@ -22,8 +25,8 @@ public class InvitationController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<String> acceptInvite(@Valid @RequestBody JoinRequest request) {
+    public ResponseEntity<Map<String, String>> acceptInvite(@Valid @RequestBody JoinRequest request) {
         invitationService.acceptInvite(request);
-        return ResponseEntity.ok("Successfully joined the team");
+        return ResponseEntity.ok(Collections.singletonMap("message", "Successfully joined the team"));
     }
 }
