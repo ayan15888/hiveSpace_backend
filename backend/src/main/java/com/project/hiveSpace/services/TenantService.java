@@ -77,7 +77,7 @@ public class TenantService {
         validateOwnership(userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return tenantRepository.countByOwnerEmail(user.getEmail());
+        return tenantRepository.countByOwnerEmailOrEmployeeUserId(user.getEmail(), userId);
     }
 
     @Transactional(readOnly = true)
@@ -85,7 +85,7 @@ public class TenantService {
         validateOwnership(userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-        return tenantRepository.findAllByOwnerEmail(user.getEmail()).stream()
+        return tenantRepository.findAllByOwnerEmailOrEmployeeUserId(user.getEmail(), userId).stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
     }

@@ -7,6 +7,7 @@ import com.project.hiveSpace.models.Role;
 import com.project.hiveSpace.models.Workspace;
 import com.project.hiveSpace.models.Tenant;
 import com.project.hiveSpace.models.User;
+import com.project.hiveSpace.repository.EmployeeRepository;
 import com.project.hiveSpace.repository.ProjectRepository;
 import com.project.hiveSpace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,7 @@ public class ProjectService {
 
     private final ProjectRepository projectRepository;
     private final WorkspaceRepository workspaceRepository;
+    private final EmployeeRepository employeeRepository;
     private final UserService userService;
 
     @Transactional
@@ -41,8 +43,10 @@ public class ProjectService {
         boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
         boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
         boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(tenant.getId());
+        boolean isMember = employeeRepository.existsByUserIdAndWorkspaceId(currentUser.getId(), workspace.getId()) || 
+                          employeeRepository.existsByUserIdAndWorkspaceTenantId(currentUser.getId(), tenant.getId());
 
-        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
+        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser && !isMember) {
             throw new IllegalArgumentException("You are not authorized to create projects in this workspace");
         }
 
@@ -81,8 +85,10 @@ public class ProjectService {
         boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
         boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
         boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(tenant.getId());
+        boolean isMember = employeeRepository.existsByUserIdAndWorkspaceId(currentUser.getId(), workspace.getId()) || 
+                          employeeRepository.existsByUserIdAndWorkspaceTenantId(currentUser.getId(), tenant.getId());
 
-        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
+        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser && !isMember) {
             throw new IllegalArgumentException("You are not authorized to view projects in this workspace");
         }
 

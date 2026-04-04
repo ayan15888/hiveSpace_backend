@@ -94,8 +94,9 @@ public class WorkspaceService {
         boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
         boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
         boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(tenantId);
+        boolean isMember = employeeRepository.existsByUserIdAndWorkspaceTenantId(currentUser.getId(), tenantId);
 
-        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
+        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser && !isMember) {
              throw new IllegalArgumentException("You are not authorized to view workspaces for this organization");
         }
 
