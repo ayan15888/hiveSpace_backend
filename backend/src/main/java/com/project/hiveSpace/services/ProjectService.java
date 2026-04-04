@@ -5,6 +5,7 @@ import com.project.hiveSpace.dto.ProjectResponse;
 import com.project.hiveSpace.models.Project;
 import com.project.hiveSpace.models.Role;
 import com.project.hiveSpace.models.Workspace;
+import com.project.hiveSpace.models.Tenant;
 import com.project.hiveSpace.models.User;
 import com.project.hiveSpace.repository.ProjectRepository;
 import com.project.hiveSpace.repository.WorkspaceRepository;
@@ -32,9 +33,14 @@ public class ProjectService {
 
         User currentUser = getCurrentUser();
         // ISOLATION CHECK: Workspace must belong to the user's current tenant, or user is owner/admin
-        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(workspace.getTenant().getOwnerEmail());
+        Tenant tenant = workspace.getTenant();
+        if (tenant == null) {
+            throw new IllegalStateException("Workspace is not associated with a valid organization");
+        }
+
+        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
         boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
-        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(workspace.getTenant().getId());
+        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(tenant.getId());
 
         if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
             throw new IllegalArgumentException("You are not authorized to create projects in this workspace");
@@ -60,15 +66,21 @@ public class ProjectService {
         return mapToResponse(savedProject);
     }
 
+    @Transactional(readOnly = true)
     public List<ProjectResponse> getProjectsByWorkspace(UUID workspaceId) {
         Workspace workspace = workspaceRepository.findById(workspaceId)
                 .orElseThrow(() -> new IllegalArgumentException("Workspace not found"));
 
         User currentUser = getCurrentUser();
         // ISOLATION CHECK: Workspace must belong to the user's current tenant, or user is owner/admin
-        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(workspace.getTenant().getOwnerEmail());
+        Tenant tenant = workspace.getTenant();
+        if (tenant == null) {
+            throw new IllegalStateException("Workspace is not associated with a valid organization");
+        }
+
+        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
         boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
-        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(workspace.getTenant().getId());
+        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(tenant.getId());
 
         if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
             throw new IllegalArgumentException("You are not authorized to view projects in this workspace");

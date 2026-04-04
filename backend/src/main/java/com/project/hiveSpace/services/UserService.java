@@ -10,6 +10,7 @@ import com.project.hiveSpace.security.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -71,6 +72,7 @@ public class UserService {
         throw new IllegalStateException("User not authenticated or invalid principal type");
     }
 
+    @Transactional(readOnly = true)
     public UserResponse getProfile(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));

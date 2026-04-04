@@ -5,7 +5,9 @@ import com.project.hiveSpace.dto.TeamResponse;
 import com.project.hiveSpace.models.Project;
 import com.project.hiveSpace.models.Role;
 import com.project.hiveSpace.models.Team;
+import com.project.hiveSpace.models.Tenant;
 import com.project.hiveSpace.models.User;
+import com.project.hiveSpace.models.Workspace;
 import com.project.hiveSpace.repository.ProjectRepository;
 import com.project.hiveSpace.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
@@ -32,9 +34,15 @@ public class TeamService {
 
         User currentUser = getCurrentUser();
         // ISOLATION CHECK: Project must belong to the user's current tenant, or user is owner/admin
-        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(project.getWorkspace().getTenant().getOwnerEmail());
+        Workspace workspace = project.getWorkspace();
+        if (workspace == null || workspace.getTenant() == null) {
+            throw new IllegalStateException("Project is not associated with a valid organization");
+        }
+        Tenant tenant = workspace.getTenant();
+
+        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
         boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
-        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(project.getWorkspace().getTenant().getId());
+        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(tenant.getId());
 
         if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
             throw new IllegalArgumentException("You are not authorized to create teams in this project");
@@ -63,15 +71,22 @@ public class TeamService {
         return mapToResponse(savedTeam);
     }
 
+    @Transactional(readOnly = true)
     public List<TeamResponse> getTeamsByProject(UUID projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
         User currentUser = getCurrentUser();
         // ISOLATION CHECK: Project must belong to the user's current tenant, or user is owner/admin
-        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(project.getWorkspace().getTenant().getOwnerEmail());
+        Workspace workspace = project.getWorkspace();
+        if (workspace == null || workspace.getTenant() == null) {
+            throw new IllegalStateException("Project is not associated with a valid organization");
+        }
+        Tenant tenant = workspace.getTenant();
+
+        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
         boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
-        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(project.getWorkspace().getTenant().getId());
+        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(tenant.getId());
 
         if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
             throw new IllegalArgumentException("You are not authorized to view teams in this project");

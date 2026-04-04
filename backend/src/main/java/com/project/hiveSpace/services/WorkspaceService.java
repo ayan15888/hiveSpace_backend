@@ -84,6 +84,7 @@ public class WorkspaceService {
         return userService.getCurrentUser();
     }
 
+    @Transactional(readOnly = true)
     public List<WorkspaceResponse> getWorkspacesByTenant(UUID tenantId) {
         Tenant tenant = tenantRepository.findById(tenantId)
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found"));

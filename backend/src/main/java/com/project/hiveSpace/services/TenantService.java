@@ -80,6 +80,7 @@ public class TenantService {
         return tenantRepository.countByOwnerEmail(user.getEmail());
     }
 
+    @Transactional(readOnly = true)
     public List<TenantResponse> getTenantsByOwnerId(UUID userId) {
         validateOwnership(userId);
         User user = userRepository.findById(userId)
