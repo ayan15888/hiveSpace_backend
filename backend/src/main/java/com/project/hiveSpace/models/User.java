@@ -57,6 +57,10 @@ public class User implements UserDetails {
                 return email; // Using email as the primary login principal
         }
 
+        public String getActualUsername() {
+                return this.username; // Return the descriptive username field
+        }
+
         @Override
         public boolean isAccountNonExpired() {
                 return true;

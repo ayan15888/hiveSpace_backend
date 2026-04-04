@@ -2,6 +2,7 @@ package com.project.hiveSpace.services;
 
 import com.project.hiveSpace.dto.TenantRequest;
 import com.project.hiveSpace.dto.TenantResponse;
+import com.project.hiveSpace.models.Role;
 import com.project.hiveSpace.models.Tenant;
 import com.project.hiveSpace.models.User;
 import com.project.hiveSpace.repository.TenantRepository;
@@ -44,6 +45,13 @@ public class TenantService {
                 .build();
 
         Tenant savedTenant = tenantRepository.save(tenant);
+
+        // Promote user to OWNER if they aren't already an owner or admin
+        if (currentUser.getRole() != Role.OWNER && currentUser.getRole() != Role.ADMIN) {
+            currentUser.setRole(Role.OWNER);
+            userRepository.save(currentUser);
+        }
+
         return mapToResponse(savedTenant);
     }
 

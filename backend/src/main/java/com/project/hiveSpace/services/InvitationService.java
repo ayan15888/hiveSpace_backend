@@ -32,12 +32,18 @@ public class InvitationService {
         
         Workspace workspace = team.getProject().getWorkspace();
 
-        // Security Check: Is the inviter a manager of THIS workspace?
-        Employee inviterEmployee = employeeRepository.findByUserIdAndWorkspaceId(currentUser.getId(), workspace.getId())
-                .orElseThrow(() -> new IllegalArgumentException("You are not a manager of this workspace"));
+        // Security Check: Is the inviter a manager of THIS workspace or the Organization Owner?
+        Tenant tenant = workspace.getTenant();
+        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
+        boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
 
-        if (!"MANAGER".equalsIgnoreCase(inviterEmployee.getRole()) && !"OWNER".equalsIgnoreCase(inviterEmployee.getRole())) {
-            throw new IllegalArgumentException("Only managers or owners can invite members");
+        if (!isOrgOwner && !isGlobalOwner) {
+            Employee inviterEmployee = employeeRepository.findByUserIdAndWorkspaceId(currentUser.getId(), workspace.getId())
+                    .orElseThrow(() -> new IllegalArgumentException("You do not have permission to invite members to this workspace."));
+
+            if (!"MANAGER".equalsIgnoreCase(inviterEmployee.getRole()) && !"OWNER".equalsIgnoreCase(inviterEmployee.getRole())) {
+                throw new IllegalArgumentException("Only workspace managers or owners can invite members.");
+            }
         }
 
         String code = generateSecureCode();
@@ -88,7 +94,7 @@ public class InvitationService {
         }
         
         // Double check matching logic
-        if (!invitation.getRecipientUsername().equalsIgnoreCase(currentUser.getUsername())) {
+        if (!invitation.getRecipientUsername().equalsIgnoreCase(currentUser.getActualUsername())) {
             throw new IllegalArgumentException("This invitation is for a different username: " + invitation.getRecipientUsername());
         }
 
@@ -158,7 +164,7 @@ public class InvitationService {
                 .projectName(invite.getTeam().getProject().getName())
                 .workspaceName(invite.getTeam().getProject().getWorkspace().getName())
                 .recipientUsername(invite.getRecipientUsername())
-                .inviterUsername(invite.getInviter().getUsername())
+                .inviterUsername(invite.getInviter().getActualUsername())
                 .status(invite.getStatus())
                 .expiresAt(invite.getExpiresAt())
                 .createdAt(invite.getCreatedAt())

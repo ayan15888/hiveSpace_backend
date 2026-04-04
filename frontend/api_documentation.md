@@ -190,7 +190,7 @@ For most requests, the following headers are generally expected:
     ```
 *   **cURL Example:**
     ```bash
-    curl -X POST http://localhost:8080/api/{tenantSlug}/workspaces/{workspaceId}/projects \
+    curl -X POST http://localhost:8080/api/workspaces/{workspaceId}/projects \
       -H "Content-Type: application/json" \
       -H "Authorization: Bearer <your_jwt_token>" \
       -d '{"name": "New Project", "description": "Project description", "status": "ACTIVE", "workspaceId": "123e4567-e89b-12d3..."}'
@@ -198,9 +198,8 @@ For most requests, the following headers are generally expected:
 
 ### Get Projects by Workspace
 *   **Method:** `GET`
-*   **Endpoint:** `/api/{tenantSlug}/workspaces/{workspaceId}/projects`
+*   **Endpoint:** `/api/workspaces/{workspaceId}/projects`
 *   **Path Variables:**
-    *   `tenantSlug` (String): The slug of the Tenant.
     *   `workspaceId` (UUID): The ID of the Workspace.
 *   **Headers:** `Authorization: Bearer <token>`
 *   **cURL Example:**
