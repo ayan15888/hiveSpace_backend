@@ -15,6 +15,7 @@ import {
   Bell,
   Search,
   Users,
+  UserPlus,
 } from "lucide-react";
 
 import {
@@ -44,6 +45,7 @@ import { gooeyToast } from "@/components/ui/goey-toaster";
 import { CreateWorkspaceModal } from "@/features/dashboard/components/CreateWorkspaceModal";
 import { CreateProjectModal } from "@/features/dashboard/components/CreateProjectModal";
 import { CreateTeamModal } from "@/features/dashboard/components/CreateTeamModal";
+import { InviteMemberModal } from "@/features/dashboard/components/InviteMemberModal";
 
 export function AppSidebar() {
   const router = useRouter();
@@ -73,6 +75,8 @@ export function AppSidebar() {
   const [isWorkspaceModalOpen, setIsWorkspaceModalOpen] = React.useState(false);
   const [isProjectModalOpen, setIsProjectModalOpen] = React.useState(false);
   const [isTeamModalOpen, setIsTeamModalOpen] = React.useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = React.useState(false);
+  const [selectedTeam, setSelectedTeam] = React.useState<{ id: string, name: string } | null>(null);
 
   const getInitials = (name: string) => {
     return name.split(" ").map(n => n[0]).join("").toUpperCase();
@@ -198,14 +202,26 @@ export function AppSidebar() {
                   {activeProject?.id === project.id && teams.length > 0 && (
                     <SidebarMenuSub>
                       {teams.map((team) => (
-                        <SidebarMenuSubItem key={team.id}>
+                        <SidebarMenuSubItem key={team.id} className="group/team-item relative flex items-center">
                           <SidebarMenuSubButton
                             isActive={activeTeam?.id === team.id}
                             onClick={() => setActiveTeam(team)}
+                            className="flex-1"
                           >
                             <Users className="h-4 w-4" />
                             <span>{team.name}</span>
                           </SidebarMenuSubButton>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setSelectedTeam({ id: team.id, name: team.name });
+                              setIsInviteModalOpen(true);
+                            }}
+                            className="absolute right-2 opacity-0 group-hover/team-item:opacity-100 p-1 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded text-zinc-500 hover:text-zinc-900 transition-opacity"
+                            title="Invite teammate"
+                          >
+                            <UserPlus className="h-3 w-3" />
+                          </button>
                         </SidebarMenuSubItem>
                       ))}
                     </SidebarMenuSub>
@@ -282,6 +298,14 @@ export function AppSidebar() {
         isOpen={isTeamModalOpen} 
         onClose={() => setIsTeamModalOpen(false)} 
       />
+      {selectedTeam && (
+        <InviteMemberModal
+          isOpen={isInviteModalOpen}
+          onClose={() => setIsInviteModalOpen(false)}
+          teamId={selectedTeam.id}
+          teamName={selectedTeam.name}
+        />
+      )}
     </Sidebar>
   );
 }

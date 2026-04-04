@@ -31,13 +31,27 @@ public class InvitationService {
                 .orElseThrow(() -> new IllegalArgumentException("Team not found"));
         
         Workspace workspace = team.getProject().getWorkspace();
+        Tenant tenant = workspace.getTenant();
 
-        // Security Check: Is the inviter a manager of THIS workspace?
-        Employee inviterEmployee = employeeRepository.findByUserIdAndWorkspaceId(currentUser.getId(), workspace.getId())
-                .orElseThrow(() -> new IllegalArgumentException("You are not a manager of this workspace"));
+        System.out.println("Processing invite: Current user=" + currentUser.getEmail() + ", Tenant owner=" + tenant.getOwnerEmail());
 
-        if (!"MANAGER".equalsIgnoreCase(inviterEmployee.getRole()) && !"OWNER".equalsIgnoreCase(inviterEmployee.getRole())) {
-            throw new IllegalArgumentException("Only managers or owners can invite members");
+        boolean isOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
+
+        if (!isOwner) {
+            System.out.println("User is not tenant owner. Checking employee records for workspace=" + workspace.getId());
+            // Security Check: Is the inviter a manager of THIS workspace?
+            Employee inviterEmployee = employeeRepository.findByUserIdAndWorkspaceId(currentUser.getId(), workspace.getId())
+                    .orElseThrow(() -> {
+                        System.out.println("Permission Denied: No employee record found for user=" + currentUser.getId() + " in workspace=" + workspace.getId());
+                        return new IllegalArgumentException("Permission Denied: You are not a manager of this workspace. If you are the organization owner, please ensure your email matches exactly.");
+                    });
+
+            System.out.println("Found employee record with role=" + inviterEmployee.getRole());
+            if (!"MANAGER".equalsIgnoreCase(inviterEmployee.getRole()) && !"OWNER".equalsIgnoreCase(inviterEmployee.getRole())) {
+                throw new IllegalArgumentException("Permission Denied: Only managers or owners can invite members. Your current role is: " + inviterEmployee.getRole());
+            }
+        } else {
+            System.out.println("User is tenant owner. Bypassing employee check.");
         }
 
         String code = generateSecureCode();
