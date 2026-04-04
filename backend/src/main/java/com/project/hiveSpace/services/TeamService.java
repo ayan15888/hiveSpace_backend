@@ -3,6 +3,7 @@ package com.project.hiveSpace.services;
 import com.project.hiveSpace.dto.TeamRequest;
 import com.project.hiveSpace.dto.TeamResponse;
 import com.project.hiveSpace.models.Project;
+import com.project.hiveSpace.models.Role;
 import com.project.hiveSpace.models.Team;
 import com.project.hiveSpace.models.User;
 import com.project.hiveSpace.repository.ProjectRepository;
@@ -30,8 +31,12 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
         User currentUser = getCurrentUser();
-        // ISOLATION CHECK: Project must belong to the user's current tenant
-        if (currentUser.getTenant() == null || !project.getWorkspace().getTenant().getId().equals(currentUser.getTenant().getId())) {
+        // ISOLATION CHECK: Project must belong to the user's current tenant, or user is owner/admin
+        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(project.getWorkspace().getTenant().getOwnerEmail());
+        boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
+        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(project.getWorkspace().getTenant().getId());
+
+        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
             throw new IllegalArgumentException("You are not authorized to create teams in this project");
         }
 
@@ -63,8 +68,12 @@ public class TeamService {
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
 
         User currentUser = getCurrentUser();
-        // ISOLATION CHECK: Project must belong to the user's current tenant
-        if (currentUser.getTenant() == null || !project.getWorkspace().getTenant().getId().equals(currentUser.getTenant().getId())) {
+        // ISOLATION CHECK: Project must belong to the user's current tenant, or user is owner/admin
+        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(project.getWorkspace().getTenant().getOwnerEmail());
+        boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
+        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(project.getWorkspace().getTenant().getId());
+
+        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
             throw new IllegalArgumentException("You are not authorized to view teams in this project");
         }
 

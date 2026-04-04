@@ -3,6 +3,7 @@ package com.project.hiveSpace.services;
 import com.project.hiveSpace.dto.WorkspaceRequest;
 import com.project.hiveSpace.dto.WorkspaceResponse;
 import com.project.hiveSpace.models.Employee;
+import com.project.hiveSpace.models.Role;
 import com.project.hiveSpace.models.Tenant;
 import com.project.hiveSpace.models.User;
 import com.project.hiveSpace.models.Workspace;
@@ -33,8 +34,12 @@ public class WorkspaceService {
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found"));
 
         User currentUser = getCurrentUser();
-        // ISOLATION CHECK: User must belong to the tenant they are creating a workspace for
-        if (currentUser.getTenant() == null || !currentUser.getTenant().getId().equals(tenant.getId())) {
+        // ISOLATION CHECK: User must belong to the tenant they are creating a workspace for, or be an owner/admin
+        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
+        boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
+        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(tenant.getId());
+
+        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
              throw new IllegalArgumentException("You are not authorized to create a workspace for this organization");
         }
 
@@ -80,13 +85,16 @@ public class WorkspaceService {
     }
 
     public List<WorkspaceResponse> getWorkspacesByTenant(UUID tenantId) {
-        if (!tenantRepository.existsById(tenantId)) {
-            throw new IllegalArgumentException("Tenant not found");
-        }
+        Tenant tenant = tenantRepository.findById(tenantId)
+                .orElseThrow(() -> new IllegalArgumentException("Tenant not found"));
 
         User currentUser = getCurrentUser();
-        // ISOLATION CHECK: User must belong to the tenant they are requesting workspaces for
-        if (currentUser.getTenant() == null || !currentUser.getTenant().getId().equals(tenantId)) {
+        // ISOLATION CHECK: User must belong to the tenant they are requesting workspaces for, or be an owner/admin
+        boolean isOrgOwner = currentUser.getEmail().equalsIgnoreCase(tenant.getOwnerEmail());
+        boolean isGlobalOwner = currentUser.getRole() == Role.OWNER || currentUser.getRole() == Role.ADMIN;
+        boolean isPrimaryTenantUser = currentUser.getTenant() != null && currentUser.getTenant().getId().equals(tenantId);
+
+        if (!isOrgOwner && !isGlobalOwner && !isPrimaryTenantUser) {
              throw new IllegalArgumentException("You are not authorized to view workspaces for this organization");
         }
 
