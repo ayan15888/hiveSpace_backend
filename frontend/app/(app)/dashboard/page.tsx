@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/store";
+import { useAuthStore, useWorkspaceStore } from "@/store";
 import { DashboardHeader } from "@/components/layout/Topbar";
 import { DashboardMetrics } from "@/components/dashboard-metrics";
 import { DashboardKanban } from "@/features/kanban/components/KanbanBoard";
@@ -12,6 +12,7 @@ import { SprintStatus, TeamWorkload } from "@/components/dashboard-widgets";
 export default function DashboardPage() {
   const router = useRouter();
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const { isLoading: workspaceLoading } = useWorkspaceStore();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -19,13 +20,13 @@ export default function DashboardPage() {
   }, []);
 
   useEffect(() => {
-    if (mounted && !authLoading && isAuthenticated && user && !user.hasTenants) {
+    if (mounted && !authLoading && !workspaceLoading && isAuthenticated && user && !user.hasTenants) {
       router.push("/onboarding");
     }
-  }, [user, isAuthenticated, authLoading, router, mounted]);
+  }, [user, isAuthenticated, authLoading, workspaceLoading, router, mounted]);
 
   // Show a blank or loading state while checking redirection
-  if (!mounted || authLoading || (isAuthenticated && user?.hasTenants === false)) {
+  if (!mounted || authLoading || workspaceLoading || (isAuthenticated && user?.hasTenants === false)) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-zinc-50 dark:bg-zinc-950">
         <div className="h-8 w-8 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
