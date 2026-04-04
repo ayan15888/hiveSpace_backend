@@ -167,10 +167,10 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       await apiClient.post<Tenant>("/api/tenants", data)
-      // Refresh tenants list after creation
-      const { user, setHasTenants } = useAuthStore.getState()
+      // Refresh user profile so hasTenants is updated from the backend
+      await useAuthStore.getState().fetchProfile()
+      const { user } = useAuthStore.getState()
       if (user) {
-        setHasTenants(true)
         await get().fetchTenants(user.id)
       }
       set({ isLoading: false })
@@ -236,9 +236,12 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     set({ isLoading: true, error: null })
     try {
       await apiClient.post("/api/i/join", { inviteCode })
-      useAuthStore.getState().setHasTenants(true)
-      // Refresh teams if an active project exists
-      if (get().activeProject) await get().fetchTeams(get().activeProject!.id)
+      // Re-fetch the user profile so hasTenants and tenant association are updated
+      await useAuthStore.getState().fetchProfile()
+      const { user } = useAuthStore.getState()
+      if (user) {
+        await get().fetchTenants(user.id)
+      }
       set({ isLoading: false })
     } catch (err: any) {
       set({ error: err.message, isLoading: false })

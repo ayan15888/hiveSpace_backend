@@ -7,7 +7,6 @@ import com.project.hiveSpace.models.Tenant;
 import com.project.hiveSpace.models.User;
 import com.project.hiveSpace.repository.TenantRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +20,7 @@ public class TenantService {
 
     private final TenantRepository tenantRepository;
     private final com.project.hiveSpace.repository.UserRepository userRepository;
+    private final UserService userService;
 
     @Transactional
     public TenantResponse createTenant(TenantRequest request) {
@@ -46,21 +46,18 @@ public class TenantService {
 
         Tenant savedTenant = tenantRepository.save(tenant);
 
-        // Promote user to OWNER if they aren't already an owner or admin
+        // Associate user with the new tenant and promote to OWNER
+        currentUser.setTenant(savedTenant);
         if (currentUser.getRole() != Role.OWNER && currentUser.getRole() != Role.ADMIN) {
             currentUser.setRole(Role.OWNER);
-            userRepository.save(currentUser);
         }
+        userRepository.save(currentUser);
 
         return mapToResponse(savedTenant);
     }
 
     private User getCurrentUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof User) {
-            return (User) principal;
-        }
-        throw new IllegalStateException("User not authenticated");
+        return userService.getCurrentUser();
     }
 
     private TenantResponse mapToResponse(Tenant tenant) {

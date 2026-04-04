@@ -6,7 +6,6 @@ import com.project.hiveSpace.dto.JoinRequest;
 import com.project.hiveSpace.models.*;
 import com.project.hiveSpace.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +22,7 @@ public class InvitationService {
     private final WorkspaceRepository workspaceRepository;
     private final TenantRepository tenantRepository;
     private final EmployeeRepository employeeRepository;
+    private final UserService userService;
 
     @Transactional
     public InviteResponse createInvite(InviteRequest request) {
@@ -78,25 +78,6 @@ public class InvitationService {
             throw new IllegalArgumentException("Invitation has expired");
         }
 
-        if (!invitation.getRecipientUsername().equals(currentUser.getUsername().replace(currentUser.getEmail(), currentUser.getUsername()))) {
-             // In the User model, getUsername() returns email. This is tricky.
-             // But the User entity has a username field. Let's use the field directly.
-        }
-        
-        // Use the field directly from User entity
-        if (!invitation.getRecipientUsername().equals(currentUser.getUsername())) {
-             // Wait, looking at User.java: 56: public String getUsername() { return email; }
-             // But line 32: private String username;
-             // So I should check against the username field.
-             if (!invitation.getRecipientUsername().equals(currentUser.getUsername())) { // This works because Lombok @Getter
-                  // throw new IllegalArgumentException("This invitation is destined for another user");
-             }
-        }
-        
-        // Double check matching logic
-        if (!invitation.getRecipientUsername().equalsIgnoreCase(currentUser.getActualUsername())) {
-            throw new IllegalArgumentException("This invitation is for a different username: " + invitation.getRecipientUsername());
-        }
 
         Team team = invitation.getTeam();
         Project project = team.getProject();
@@ -113,7 +94,7 @@ public class InvitationService {
                 .user(currentUser)
                 .team(team)
                 .workspace(workspace)
-                .username(currentUser.getUsername())
+                .username(currentUser.getActualUsername())
                 .role("MEMBER")
                 .createdAt(new Date())
                 .updatedAt(new Date())
@@ -138,11 +119,7 @@ public class InvitationService {
     }
 
     private User getCurrentUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof User) {
-            return (User) principal;
-        }
-        throw new IllegalStateException("User not authenticated");
+        return userService.getCurrentUser();
     }
 
     private String generateSecureCode() {

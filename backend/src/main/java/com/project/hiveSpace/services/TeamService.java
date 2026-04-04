@@ -4,6 +4,7 @@ import com.project.hiveSpace.dto.TeamRequest;
 import com.project.hiveSpace.dto.TeamResponse;
 import com.project.hiveSpace.models.Project;
 import com.project.hiveSpace.models.Team;
+import com.project.hiveSpace.models.User;
 import com.project.hiveSpace.repository.ProjectRepository;
 import com.project.hiveSpace.repository.TeamRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,11 +22,18 @@ public class TeamService {
 
     private final TeamRepository teamRepository;
     private final ProjectRepository projectRepository;
+    private final UserService userService;
 
     @Transactional
     public TeamResponse createTeam(TeamRequest request) {
         Project project = projectRepository.findById(request.getProjectId())
                 .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
+        User currentUser = getCurrentUser();
+        // ISOLATION CHECK: Project must belong to the user's current tenant
+        if (currentUser.getTenant() == null || !project.getWorkspace().getTenant().getId().equals(currentUser.getTenant().getId())) {
+            throw new IllegalArgumentException("You are not authorized to create teams in this project");
+        }
 
         if (teamRepository.existsByNameAndProject(request.getName(), project)) {
             throw new IllegalArgumentException(
@@ -51,14 +59,23 @@ public class TeamService {
     }
 
     public List<TeamResponse> getTeamsByProject(UUID projectId) {
-        if (!projectRepository.existsById(projectId)) {
-            throw new IllegalArgumentException("Project not found");
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found"));
+
+        User currentUser = getCurrentUser();
+        // ISOLATION CHECK: Project must belong to the user's current tenant
+        if (currentUser.getTenant() == null || !project.getWorkspace().getTenant().getId().equals(currentUser.getTenant().getId())) {
+            throw new IllegalArgumentException("You are not authorized to view teams in this project");
         }
 
         return teamRepository.findAllByProjectId(projectId)
                 .stream()
                 .map(this::mapToResponse)
                 .collect(Collectors.toList());
+    }
+
+    private User getCurrentUser() {
+        return userService.getCurrentUser();
     }
 
     private TeamResponse mapToResponse(Team team) {

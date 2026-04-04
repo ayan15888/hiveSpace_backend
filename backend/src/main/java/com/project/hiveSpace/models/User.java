@@ -33,7 +33,7 @@ public class User implements UserDetails {
 
         @Builder.Default
         @Column(nullable = false)
-        final Boolean active = true;
+        private Boolean active = true;
 
         @JsonIgnore
         @Column(nullable = false)

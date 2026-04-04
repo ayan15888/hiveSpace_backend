@@ -10,7 +10,6 @@ import com.project.hiveSpace.repository.EmployeeRepository;
 import com.project.hiveSpace.repository.TenantRepository;
 import com.project.hiveSpace.repository.WorkspaceRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,11 +25,18 @@ public class WorkspaceService {
     private final WorkspaceRepository workspaceRepository;
     private final TenantRepository tenantRepository;
     private final EmployeeRepository employeeRepository;
+    private final UserService userService;
 
     @Transactional
     public WorkspaceResponse createWorkspace(WorkspaceRequest request) {
         Tenant tenant = tenantRepository.findById(request.getTenantId())
                 .orElseThrow(() -> new IllegalArgumentException("Tenant not found"));
+
+        User currentUser = getCurrentUser();
+        // ISOLATION CHECK: User must belong to the tenant they are creating a workspace for
+        if (currentUser.getTenant() == null || !currentUser.getTenant().getId().equals(tenant.getId())) {
+             throw new IllegalArgumentException("You are not authorized to create a workspace for this organization");
+        }
 
         // Check workspace name uniqueness within this tenant
         if (workspaceRepository.existsByNameAndTenant(request.getName(), tenant)) {
@@ -50,7 +56,7 @@ public class WorkspaceService {
         Workspace savedWorkspace = workspaceRepository.save(workspace);
 
         // Automatically add the creator as an OWNER of this workspace
-        User currentUser = getCurrentUser();
+        // User currentUser = getCurrentUser(); // Already fetched above
         Employee ownerEmployee = Employee.builder()
                 .user(currentUser)
                 .workspace(savedWorkspace)
@@ -70,16 +76,18 @@ public class WorkspaceService {
     }
 
     private User getCurrentUser() {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principal instanceof User) {
-            return (User) principal;
-        }
-        throw new IllegalStateException("User not authenticated");
+        return userService.getCurrentUser();
     }
 
     public List<WorkspaceResponse> getWorkspacesByTenant(UUID tenantId) {
         if (!tenantRepository.existsById(tenantId)) {
             throw new IllegalArgumentException("Tenant not found");
+        }
+
+        User currentUser = getCurrentUser();
+        // ISOLATION CHECK: User must belong to the tenant they are requesting workspaces for
+        if (currentUser.getTenant() == null || !currentUser.getTenant().getId().equals(tenantId)) {
+             throw new IllegalArgumentException("You are not authorized to view workspaces for this organization");
         }
 
         return workspaceRepository.findAllByTenantId(tenantId)
